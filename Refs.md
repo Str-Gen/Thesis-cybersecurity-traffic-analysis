@@ -5,7 +5,7 @@
 ### Environment & testbeds
 
 [Scalable distributed traffic monitoring for enterprise networks with Spark Streaming]()  
-[SANS: A Practical Application of SIM/SEM/SIEM Automating Threat Identification] (https://www.sans.org/reading-room/whitepapers/logging/practical-application-sim-sem-siem-automating-threat-identification-1781)  
+[SANS: A Practical Application of SIM/SEM/SIEM Automating Threat Identification](https://www.sans.org/reading-room/whitepapers/logging/practical-application-sim-sem-siem-automating-threat-identification-1781)  
 [The Deter Project](https://www.slideshare.net/DETER-Project/detercomm-the-deter-project-advancing-the-science-of-cyber-security-experimentation-and-testmirkovicbenzelfaberbradenwroclawskischwab)  
 [Deter: cyber security experimentation](https://www.slideshare.net/DETER-Project/deter-projectsciencecybersecuritybenzel?from_action=save)  
 [Experience with Deter](http://bnrg.cs.berkeley.edu/~adj/publications/paper-files/tridentcom2006-deter.pdf)  
