@@ -75,6 +75,7 @@ Unsupervised Network Anomaly Detection in Real-Time on Big Data (no fulltext yet
 [Big Data Analytics for User-Activity Analysis and User-Anomaly Detection in Mobile Wireless Network](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7811244)  
 [A Big Data Analytics Based Approach to Anomaly Detection](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7877066)  
 [Development of a network intrusion detection system using Apache Hadoop and Spark](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8073860)  
+[Big Data Analytics for Security](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6682971)  
 
 ## Relevante boeken
 
