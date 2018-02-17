@@ -1,6 +1,6 @@
-# Referentielijst
+# List of references
 
-## Relevante papers
+## Relevant papers
 
 ### Environment & testbeds
 
@@ -18,7 +18,7 @@
 [User Traffic Profile for Traffic Reduction and Effective Bot C&C Detection](http://ijns.jalaxy.com.tw/contents/ijns-v16-n1/ijns-2014-v16-n1-p46-52.pdf)  
 [Passive Monitoring of DNS Anomalies](https://www.caida.org/publications/papers/2007/dns_anomalies/dns_anomalies.pdf)  
 
-### Anomaly detection
+### Anomaly detection - Papers
 
 #### Review papers
 
@@ -77,15 +77,30 @@ Unsupervised Network Anomaly Detection in Real-Time on Big Data (no fulltext yet
 [Development of a network intrusion detection system using Apache Hadoop and Spark](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8073860)  
 [Big Data Analytics for Security](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6682971)  
 
-## Relevante boeken
+### ML & Big data online sources
 
-### Talen & frameworks
+[Approaching machine learning problems](http://blog.kaggle.com/2016/07/21/approaching-almost-any-machine-learning-problem-abhishek-thakur/?utm_medium=email&utm_source=intercom&utm_campaign=new+user+onboarding)  
+[Machine learning framework](http://5047-presscdn.pagely.netdna-cdn.com/wp-content/uploads/2016/07/abhishek_2.png)  
+
+## Other relevant information
+
+### Languages, frameworks and libraries
 
 Violent Python, TJ O'Connor  
 Fluent Python, Luciano Ramalho  
 Data Mining: Practical Machine Learning Tools and Techniques, Ian H. Witten, Eibe Frank, Mark A. Hall, Christopher J. Pal  
+[Concurrent Python processes](https://medium.com/@ageitgey/quick-tip-speed-up-your-python-data-processing-scripts-with-process-pools-cf275350163a)  
+[Python pickling](https://docs.python.org/3/library/pickle.html)  
+[Pandas: operations on data](http://pandas.pydata.org/)  
+[Scikit-learn: machine learning models](http://scikit-learn.org/stable/)  
+[Xgboost:Gradient boosting](https://github.com/dmlc/xgboost)  
+[Keras: neural networks](https://keras.io/)  
+[Tensorflow](https://www.tensorflow.org/)  
+[Nvidia CUDA](https://developer.nvidia.com/cuda-downloads)  
+[Matplotlib: plotting data](http://matplotlib.org/)  
+[Tqdm: monitoring progress](https://pypi.python.org/pypi/tqdm)  
 
-## Bijkomende informatie (workflow e.d.)
+## Workflow related lookups
 
 ### Git
 
