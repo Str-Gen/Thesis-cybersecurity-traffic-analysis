@@ -28,6 +28,7 @@
 [A Taxonomy of Anomalies in Backbone Network Traffic](http://www.necoma-project.eu/m/filer_public/0d/34/0d34ebf0-0e45-46ea-a40b-852bc6eb758f/johan_taxonomy.pdf)  
 [Visual comparison of Network Anomaly Detectors with Chord Diagrams](http://www.necoma-project.eu/m/filer_public/de/6a/de6a5143-25d7-4026-a0d2-1f4d7a03f2ce/johan_sac2014.pdf)  
 [An overview of anomaly detection techniques: Existing solutions and latest technological trends](https://ac.els-cdn.com/S138912860700062X/1-s2.0-S138912860700062X-main.pdf?_tid=50d7f75a-1018-11e8-915c-00000aab0f01&acdnat=1518455906_0d597c3756c00c0116c855347fef82c8)  
+[Intrusion detection system: A comprehensive review](https://www.sciencedirect.com/science/article/pii/S1084804512001944#)  
 
 #### Profile based
 
@@ -40,7 +41,6 @@
 [An Analysis of the 1999 DARPA/Lincoln Laboratory Evaluation Data for Network Anomaly Detection](https://dspace-test.lib.fit.edu/bitstream/handle/11141/109/cs-2003-02.pdf?sequence=1&isAllowed=y)  
 [Network anomaly detection](https://www.net.in.tum.de/fileadmin/TUM/NET/NET-2017-09-1.pdf#page=65)  
 [Network anomaly detection 2](https://pdfs.semanticscholar.org/2057/7c206c93730f9cd04f8ca2692239940495a0.pdf)  
-[Network anomaly detecion 3](https://www.osti.gov/servlets/purl/1115240)  
 Unsupervised Network Anomaly Detection in Real-Time on Big Data (no fulltext yet)  
 [Distributed network traffic feature extraction for a real-time IDS](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7535295)  
 [Unsupervised Network Intrusion Detection Systems: Detecting the Unknown without Knowledge](https://hal.archives-ouvertes.fr/file/index/docid/736278/filename/paper_comcom_2011.pdf)  
@@ -51,18 +51,19 @@ Unsupervised Network Anomaly Detection in Real-Time on Big Data (no fulltext yet
 [Enhancing Security Event Management Systems with Unsupervised Anomaly Detection](https://www.goldiges.de/publications/SIEM_Anomaly_Detection.pdf)  
 [Integrating short history for improving clustering based network traffic anomaly detection](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8064128)  
 [CEFF: An efficient approach for traffic anomaly detection and classification](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8024622)  
+[CANN: An intrusion detection system based on combining cluster centers and nearest neighbors](https://www.sciencedirect.com/science/article/pii/S0950705115000167)  
+[Fuzziness based semi-supervised learning approach for intrusion detection system](https://www.sciencedirect.com/science/article/pii/S0020025516302547)  
+[Anomaly detection and visualization using Fisher Discriminant clustering of network entropy](http://ieeexplore.ieee.org/abstract/document/4746810/)  
+[A hybrid machine learning approach to network anomaly detection](https://ac.els-cdn.com/S0020025507001648/1-s2.0-S0020025507001648-main.pdf?_tid=8c7447e4-101a-11e8-a0f4-00000aacb361&acdnat=1518456865_94450eb6cbc278aa792ca1093953333e)  
 
 #### Big Data
 
-[Anomaly detection and visualization using Fisher Discriminant clustering of network entropy](http://ieeexplore.ieee.org/abstract/document/4746810/)  
 [A Survey of Clustering Algorithms for Big Data: Taxonomy and Empirical Analysis](http://ieeexplore.ieee.org/abstract/document/6832486/)  
-[Hashdoop: A MapReduce Framework for Network Anomaly Detection](http://www.necoma-project.eu/m/filer_public/78/9f/789f6ade-cde6-4d41-91fe-f59f8beb25c9/romain_hashdoop_bigsec2014.pdf)  
 [On the Use of Data Mining Techniques for the Clustering of URLs Extracted from Network-based Malware Traces](http://www.necoma-project.eu/m/filer_public/88/5a/885aecae-e81d-4267-ae66-c6fde28245cd/imt_poster_necoma-urlanalysis.pdf)  
 [Anomaly detection system for enterprise network security](https://patentimages.storage.googleapis.com/3e/65/62/1b8cdf42d951c1/US9112895.pdf)  
 [Online Anomaly Detection over Big Data Streams](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7363865)  
 [Statistical Technique for Online Anomaly Detection Using Spark Over Heterogeneous Data from Multi-source VMware Performance Data](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7004343)  
 [Efficient classification using parallel and scalable compressed model and its application on intrusion detection](https://ac.els-cdn.com/S0957417414002048/1-s2.0-S0957417414002048-main.pdf?_tid=716ed8ba-101a-11e8-8b21-00000aacb360&acdnat=1518456828_a478e0449dea10ad7c1ce9c111d91fe4)  
-[A hybrid machine learning approach to network anomaly detection](https://ac.els-cdn.com/S0020025507001648/1-s2.0-S0020025507001648-main.pdf?_tid=8c7447e4-101a-11e8-a0f4-00000aacb361&acdnat=1518456865_94450eb6cbc278aa792ca1093953333e)  
 [POSTER: Anomaly-based misbehaviour detection in connected car backends](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7835978)  
 [Behavior-based anomaly detection on big data](http://ro.ecu.edu.au/cgi/viewcontent.cgi?article=1182&context=ism)  
 [Anomaly Detection in Log Data using Graph Databases and Machine Learning to Defend Advanced Persistent Threats](https://arxiv.org/pdf/1802.00259.pdf)  
@@ -80,7 +81,8 @@ Unsupervised Network Anomaly Detection in Real-Time on Big Data (no fulltext yet
 ### Talen & frameworks
 
 Violent Python, TJ O'Connor  
-Fluent Python, Luciano Ramalho
+Fluent Python, Luciano Ramalho  
+Data Mining: Practical Machine Learning Tools and Techniques, Ian H. Witten, Eibe Frank, Mark A. Hall, Christopher J. Pal  
 
 ## Bijkomende informatie (workflow e.d.)
 
