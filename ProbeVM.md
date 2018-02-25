@@ -4,15 +4,19 @@
 
 ### Prerequisites
 
+* apt-get install
+
+```bash
+sudo apt-get install ruby libopenssl-ruby libyaml-ruby libdl-ruby libiconv-ruby libreadlineruby irb ri rubygems
+sudo apt-get install subversion
+sudo apt-get install build-essential ruby-dev libpcap-dev nmap python-pip
+```
+
 * Metasploit
 
 ```bash
 wget https://downloads.metasploit.com/data/releases/metasploit-latest-linux-x64-installer.run && wget https://downloads.metasploit.com/data/releases/metasploit-latest-linux-x64-installer.run.sha1 && echo $(cat metasploit-latest-linux-x64-installer.run.sha1)'  'metasploit-latest-linux-x64-installer.run > metasploit-latest-linux-x64-installer.run.sha1 && shasum -c metasploit-latest-linux-x64-installer.run.sha1 && chmod +x ./metasploit-latest-linux-x64-installer.run && sudo ./metasploit-latest-linux-x64-installer.run
 ```
-
-* Ruby, git, pip & nmap
-
-`sudo apt-get install ruby git python-pip nmap`
 
 * Create RPC server for metasploit
 
