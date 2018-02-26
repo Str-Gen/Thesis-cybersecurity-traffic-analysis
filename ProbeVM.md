@@ -21,7 +21,7 @@ sudo apt-get install -y subversion
 sudo apt-get install -y build-essential ruby-dev libpcap-dev
 ```
 
-* Metasploit (no GUI installer !)
+* Metasploit (no graphical installer ! [nightly](https://github.com/rapid7/metasploit-framework/wiki/Nightly-Installers))
 
 ```bash
 curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall &&  ./msfinstall
@@ -29,11 +29,11 @@ curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/t
 
 * Start Metasploit RPC server on localhost
 
-`msfrpcd -U msf -P msfpass -a 127.0.0.1 -p 55552`
+`# msfrpcd -U msf -P msfpass -p 55552 -f "/api/" -S`
 
-Currently has issues when trying to connect with apt2, workaround
+In case of issues when trying to connect with apt2, workaround:
 
-```
+```bash
 msfconsole
 load msgrpc User=msf Password=msfpass NetworkPort=55552
 ```
