@@ -1,8 +1,6 @@
 # Metasploit VM automation
 
-## Probing the network
-
-### Prerequisites
+## Prerequisites
 
 * Virtual wall IPv4 internet access (NAT)
 
@@ -27,9 +25,11 @@ sudo apt-get install -y build-essential ruby-dev libpcap-dev
 curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall &&  ./msfinstall
 ```
 
+## Starting APT2
+
 * Start Metasploit RPC server on localhost
 
-`# msfrpcd -U msf -P msfpass -p 55552 -f "/api/" -S`
+`sudo msfrpcd -U msf -P msfpass -p 55552 -f "/api/" -a 127.0.0.1 -S &`
 
 In case of issues when trying to connect with apt2, workaround:
 
@@ -38,7 +38,9 @@ msfconsole
 load msgrpc User=msf Password=msfpass NetworkPort=55552
 ```
 
-* APT2
+* APT2 basic
+
+pip dependencies can't be listed in one line if one depends on the other
 
 ```bash
 git clone https://github.com/MooseDojo/apt2.git
@@ -53,8 +55,22 @@ sudo pip install yattag
 sudo pip install netaddr
 sudo pip install shodan
 sudo pip install pysmb
+sudo pip install whois
+sudo pip install ipwhois
+sudo pip install pyasn1
+sudo pip install impacket
 
 ```
+
+* APT advanced (optional apt-get installs)
+
+`sudo apt-get install john sslscan sqlite3 snmp smbclient hyrda python-netaddr phantomjs ldap-utils`
+
+### actually runnning APT2 (requires msfrpcd)
+
+Interactive: `sudo python apt2.py -v -v`
+
+Non-interactive `sudo python apt2.py -v -v -b --target 192.168.0.0/24`
 
 ## Virtual wall shared location
 
