@@ -4,23 +4,39 @@
 
 ### Prerequisites
 
+* Virtual wall IPv4 internet access (NAT)
+
+```bash
+sudo route del default gw 10.2.15.254 && sudo route add default gw 10.2.15.253
+sudo route add -net 10.11.0.0 netmask 255.255.0.0 gw 10.2.15.254
+sudo route add -net 10.2.32.0 netmask 255.255.240.0 gw 10.2.15.254
+```
+
 * apt-get install
 
 ```bash
-sudo apt-get install ruby libopenssl-ruby libyaml-ruby libdl-ruby libiconv-ruby libreadlineruby irb ri rubygems
-sudo apt-get install subversion
-sudo apt-get install build-essential ruby-dev libpcap-dev nmap python-pip
+sudo apt-get update
+sudo apt-get install -y ruby git nmap python-pip
+sudo apt-get install -y subversion
+sudo apt-get install -y build-essential ruby-dev libpcap-dev
 ```
 
-* Metasploit
+* Metasploit (no GUI installer !)
 
 ```bash
-wget https://downloads.metasploit.com/data/releases/metasploit-latest-linux-x64-installer.run && wget https://downloads.metasploit.com/data/releases/metasploit-latest-linux-x64-installer.run.sha1 && echo $(cat metasploit-latest-linux-x64-installer.run.sha1)'  'metasploit-latest-linux-x64-installer.run > metasploit-latest-linux-x64-installer.run.sha1 && shasum -c metasploit-latest-linux-x64-installer.run.sha1 && chmod +x ./metasploit-latest-linux-x64-installer.run && sudo ./metasploit-latest-linux-x64-installer.run
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall &&  ./msfinstall
 ```
 
-* Create RPC server for metasploit
+* Start Metasploit RPC server on localhost
 
-`msfrpc msfrpc -U msf -P msfpass -a 127.0.0.1:55552`
+`msfrpcd -U msf -P msfpass -a 127.0.0.1 -p 55552`
+
+Currently has issues when trying to connect with apt2, workaround
+
+```
+msfconsole
+load msgrpc User=msf Password=msfpass NetworkPort=55552
+```
 
 * APT2
 
@@ -30,8 +46,16 @@ sudo pip install cython
 sudo pip install unqlite
 sudo pip install python-nmap
 sudo pip install msgpack-python
+sudo pip install scapy
+sudo pip install whois
+sudo pip install ftputil
+sudo pip install yattag
+sudo pip install netaddr
+sudo pip install shodan
+sudo pip install pysmb
+
 ```
 
-* Metasploit RPC server on localhost
+## Virtual wall shared location
 
-`msfrpcd -U msf -P msfpass -a 127.0.0.1 -p 55552`
+in elke VM __/groups/wall2-ilabt-iminds-be/cybersecurity/__
