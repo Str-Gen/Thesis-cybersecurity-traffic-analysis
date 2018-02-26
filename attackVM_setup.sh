@@ -39,5 +39,5 @@ pip_install_python_modules(){
 }
 
 install_apt_extra(){
-    sudo apt-get install john sslscan sqlite3 snmp smbclient hyrda python-netaddr phantomjs ldap-utils
+    sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils
 }

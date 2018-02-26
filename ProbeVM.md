@@ -64,7 +64,7 @@ sudo pip install impacket
 
 * APT advanced (optional apt-get installs)
 
-`sudo apt-get install john sslscan sqlite3 snmp smbclient hyrda python-netaddr phantomjs ldap-utils`
+`sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils`
 
 ### actually runnning APT2 (requires msfrpcd)
 
