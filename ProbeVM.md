@@ -35,7 +35,7 @@ In case of issues when trying to connect with apt2, workaround:
 
 ```bash
 msfconsole
-load msgrpc User=msf Password=msfpass NetworkPort=55552
+load msgrpc User=msf Pass=msfpass NetworkPort=55552
 ```
 
 * APT2 basic

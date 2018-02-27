@@ -41,3 +41,8 @@ pip_install_python_modules(){
 install_apt_extra(){
     sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils
 }
+
+start_msfrpcd(){
+    sudo msfrpcd -U msf -P msfpass -p 55552 -f "/api/" -a 127.0.0.1 -S
+}
+
