@@ -15,9 +15,13 @@ install_metasploit(){
     curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall &&  ./msfinstall
 }
 
-acquire_apt_in_home(){ 
-    cd ~
-    git clone https://github.com/MooseDojo/apt2.git
+acquire_apt2_in_shared_space(){ 
+    cd /groups/wall2-ilabt-iminds-be/cybersecurity/
+    git clone https://github.com/Str-Gen/apt2.git
+}
+
+install_apt2_extra(){
+    sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils
 }
 
 pip_install_python_modules(){ 
@@ -36,10 +40,6 @@ pip_install_python_modules(){
     sudo pip install ipwhois
     sudo pip install pyasn1
     sudo pip install impacket
-}
-
-install_apt_extra(){
-    sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils
 }
 
 start_msfrpcd(){

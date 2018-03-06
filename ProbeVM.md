@@ -1,77 +1,73 @@
 # Metasploit VM automation
 
-## Prerequisites
+This markdown document contains information about the VM that has been set up to simulate a malicious node.
+The automation code itself (shell), has been left out and only a description of the available functions in apt2/misc/attackVM_setup.sh is kept here.
+The purpose of this file is to provide a detailed description to rebuild the image from the stock Ubuntu 16.04LTS image that is available on the wall.
+Some caveats about using the automation framework are also listed here.
 
-* Virtual wall IPv4 internet access (NAT)
+## Installation
 
-```bash
-sudo route del default gw 10.2.15.254 && sudo route add default gw 10.2.15.253
-sudo route add -net 10.11.0.0 netmask 255.255.0.0 gw 10.2.15.254
-sudo route add -net 10.2.32.0 netmask 255.255.240.0 gw 10.2.15.254
-```
+* `ipv4_nat_access()`
 
-* apt-get install
+Virtual wall IPv4 internet access (NAT)
 
-```bash
-sudo apt-get update
-sudo apt-get install -y ruby git nmap python-pip
-sudo apt-get install -y subversion
-sudo apt-get install -y build-essential ruby-dev libpcap-dev
-```
+[The virtual wall](https://www.ugent.be/ea/idlab/en/research/research-infrastructure/virtual-wall.htm) where the experiments are run, have a limited supply op IPv4 addresses.
+In order to access the outside world, you have to configure NAT-ing as described on [this](http://doc.ilabt.iminds.be/ilabt-documentation/tipsandtricks.html) page.
 
-* Metasploit (no graphical installer ! [nightly](https://github.com/rapid7/metasploit-framework/wiki/Nightly-Installers))
+* `basic_prerequisites()`
 
-```bash
-curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall &&  ./msfinstall
-```
+Some software is required before anything else. The required packages are bundled in this shell function. (Git, ruby, subversion, python-pip,...)
+Uses apt-get, so for other distributions that could serve as base image this function would need to be adapted.
+
+* `install_metasploit()`
+
+An automated way to install the metasploit framework. The default installers are graphical and require user-interaction to complete the process.
+
+Metasploit (no graphical installer ! [nightly](https://github.com/rapid7/metasploit-framework/wiki/Nightly-Installers))
+
+* `acquire_apt2_in_shared_space()`
+
+This will clone [my fork of the apt2 github repo](https://github.com/Str-Gen/apt2.git) to the shared location for the cybersecurity project.
+
+* `pip_install_python_modules()`
+
+APT2 relies on certain python modules to run the various payloads. This function installs the necessary ones (at the time of writing March 2018).
+
+Dependencies that rely on each other can't be installed with a single invocation of pip install followed by a list. That's why in the shellscript every module install command is on a new line.
+
+* `install_apt2_extra()`
+
+APT2 also relies on some software distributed as packages.
+
+__These functions used togheter should be able to mirror the current setup of the VM.__
 
 ## Starting APT2
 
-* Start Metasploit RPC server on localhost
+* `start_msfrpcd()`
 
-`sudo msfrpcd -U msf -P msfpass -p 55552 -f "/api/" -a 127.0.0.1 -S &`
+Starts Metasploit RPC server on localhost. 
+__Note that this method does work, but you can't read output from the metasploit console when using this method, nor will you be able to tap into the sessions that can be automatically created on the compromised targets if an exploit succeeded.__
 
-In case of issues when trying to connect with apt2, workaround:
+* The interactive approach
+
+This method is currently required, certainly if you wish to run the ipidseq.py module. This is something that I've tried to automate, but so far no methods work. It's annoying if all you have is a single terminal ssh connection to the machine running metasploit. Msfconsole can't be backgrounded without stopping it and launching it in a subshell with a script that contains the necessary setup steps doesn't work either.
+Therefore if you want to have interaction this is how to connect:
 
 ```bash
-msfconsole
+sudo msfconsole
 load msgrpc User=msf Pass=msfpass NetworkPort=55552
 ```
 
-* APT2 basic
+### actually runnning APT2 (requires msfrpcd first or the interactive method)
 
-pip dependencies can't be listed in one line if one depends on the other
-
-```bash
-git clone https://github.com/MooseDojo/apt2.git
-sudo pip install cython
-sudo pip install unqlite
-sudo pip install python-nmap
-sudo pip install msgpack-python
-sudo pip install scapy
-sudo pip install whois
-sudo pip install ftputil
-sudo pip install yattag
-sudo pip install netaddr
-sudo pip install shodan
-sudo pip install pysmb
-sudo pip install whois
-sudo pip install ipwhois
-sudo pip install pyasn1
-sudo pip install impacket
-
-```
-
-* APT advanced (optional apt-get installs)
-
-`sudo apt-get install -y john sslscan sqlite3 snmp smbclient hydra python-netaddr phantomjs ldap-utils`
-
-### actually runnning APT2 (requires msfrpcd)
+__Caveat:__ running APT2 requires superuser rights, mostly because of the tools they may invoke. There are probably ways around this restriction, but this is the easiest way to get going.
 
 Interactive: `sudo python apt2.py -v -v`
 
 Non-interactive `sudo python apt2.py -v -v -b --target 192.168.0.0/24`
 
+For more information on the capabilities of APT2 I'll refer to the official documentation over at [https://github.com/MooseDojo/apt2].
+
 ## Virtual wall shared location
 
-in elke VM __/groups/wall2-ilabt-iminds-be/cybersecurity/__
+In each VM this folder __/groups/wall2-ilabt-iminds-be/cybersecurity/__ is currently a preserved, shared space to store work.
