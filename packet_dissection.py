@@ -46,7 +46,7 @@ def main(argv):
                     if detaillayer not in attributes_per_layer:
                         attributes_per_layer[detaillayer] = pkt[detaillayer].fields.keys()
                 else:
-                    print "Detail layer " + layer.split(' ')[-1]+"still not recognized"
+                    print "Detail layer "+layer.split(' ')[-1]+" still not recognized"
                 continue
         # Store all info of the packet in a single object
         fully_mapped_data.append(one_full_packet)
