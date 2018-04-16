@@ -14,11 +14,12 @@ def main(argv):
     for p in myreader:
         pkt = p.payload
         print "p time", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(p.time))
-        print "pkt time", time.strftime(
-            '%Y-%m-%d %H:%M:%S', time.localtime(pkt.time))
+        print "pkt time", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(pkt.time))
         for part in expand(p):
             print part, " ",
-        print 
+        print
+        print "p length",len(p)
+        print p.summary()
 
         if i == 50:
             break
