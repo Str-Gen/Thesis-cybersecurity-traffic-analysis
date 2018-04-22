@@ -152,4 +152,12 @@ attack_dict = {
 }
 
 
+# one hot encoding for categorical features
+for cat in nominal_cols:
+    one_hot = pd.get_dummies(dataframe[cat])    
+    dataframe = dataframe.drop(cat,axis=1)
+    dataframe = dataframe.join(one_hot)
+
+print dataframe.shape
+
 
