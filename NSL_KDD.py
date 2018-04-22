@@ -26,7 +26,9 @@ col_names = np.array(["duration","protocol_type","service","flag","src_bytes",
     "diff_srv_rate","srv_diff_host_rate","dst_host_count","dst_host_srv_count",
     "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
     "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
-    "dst_host_rerror_rate","dst_host_srv_rerror_rate","labels"])
+    "dst_host_rerror_rate","dst_host_srv_rerror_rate","labels","labels_numeric"])
+
+
 
 # All columns with nominal values (strings)
 nominal_indexes = [1,2,3]
@@ -43,8 +45,111 @@ numeric_cols = col_names[numeric_indexes].tolist()
 
 dataframe = pandas.read_csv(train20_nsl_kdd_dataset_path,names=col_names)
 
-with pandas.option_context('display.max_rows', None, 'display.max_columns',10):
+with pandas.option_context('display.max_rows', 10, 'display.max_columns',None):
     print dataframe
+
+# Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
+attack_dict_coarse = {
+    'normal': 'normal',
+    
+    'back': 'attack',
+    'land': 'attack',
+    'neptune': 'attack',
+    'pod': 'attack',
+    'smurf': 'attack',
+    'teardrop': 'attack',
+    'mailbomb': 'attack',
+    'apache2': 'attack',
+    'processtable': 'attack',
+    'udpstorm': 'attack',
+    
+    'ipsweep': 'attack',
+    'nmap': 'attack',
+    'portsweep': 'attack',
+    'satan': 'attack',
+    'mscan': 'attack',
+    'saint': 'attack',
+
+    'ftp_write': 'attack',
+    'guess_passwd': 'attack',
+    'imap': 'attack',
+    'multihop': 'attack',
+    'phf': 'attack',
+    'spy': 'attack',
+    'warezclient': 'attack',
+    'warezmaster': 'attack',
+    'sendmail': 'attack',
+    'named': 'attack',
+    'snmpgetattack': 'attack',
+    'snmpguess': 'attack',
+    'xlock': 'attack',
+    'xsnoop': 'attack',
+    'worm': 'attack',
+    
+    'buffer_overflow': 'attack',
+    'loadmodule': 'attack',
+    'perl': 'attack',
+    'rootkit': 'attack',
+    'httptunnel': 'attack',
+    'ps': 'attack',    
+    'sqlattack': 'attack',
+    'xterm': 'attack'
+}
+
+dataframe["labels"] = dataframe["labels"].apply(lambda x: attack_dict_coarse[x])
+
+with pandas.option_context('display.max_rows', 10, 'display.max_columns',None):
+    print dataframe["labels"]
+
+# Fine-grained dictionary, packets are normal or attacks, and the attacks are divided into 4 subcategories
+
+# Dictionary that contains mapping of various attacks to the four main categories
+attack_dict = {
+    'normal': 'normal',
+    
+    'back': 'DoS',
+    'land': 'DoS',
+    'neptune': 'DoS',
+    'pod': 'DoS',
+    'smurf': 'DoS',
+    'teardrop': 'DoS',
+    'mailbomb': 'DoS',
+    'apache2': 'DoS',
+    'processtable': 'DoS',
+    'udpstorm': 'DoS',
+    
+    'ipsweep': 'Probe',
+    'nmap': 'Probe',
+    'portsweep': 'Probe',
+    'satan': 'Probe',
+    'mscan': 'Probe',
+    'saint': 'Probe',
+
+    'ftp_write': 'R2L',
+    'guess_passwd': 'R2L',
+    'imap': 'R2L',
+    'multihop': 'R2L',
+    'phf': 'R2L',
+    'spy': 'R2L',
+    'warezclient': 'R2L',
+    'warezmaster': 'R2L',
+    'sendmail': 'R2L',
+    'named': 'R2L',
+    'snmpgetattack': 'R2L',
+    'snmpguess': 'R2L',
+    'xlock': 'R2L',
+    'xsnoop': 'R2L',
+    'worm': 'R2L',
+    
+    'buffer_overflow': 'U2R',
+    'loadmodule': 'U2R',
+    'perl': 'U2R',
+    'rootkit': 'U2R',
+    'httptunnel': 'U2R',
+    'ps': 'U2R',    
+    'sqlattack': 'U2R',
+    'xterm': 'U2R'
+}
 
 
 
