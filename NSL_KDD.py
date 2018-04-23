@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from time import time
 from collections import OrderedDict
+from sklearn import model_selection
+from sklearn.neighbors import KNeighborsClassifier
+
 # %matplotlib inline
 gt0 = time()
 
@@ -50,50 +53,50 @@ with pandas.option_context('display.max_rows', 10, 'display.max_columns',None):
 
 # Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
 attack_dict_coarse = {
-    'normal': 'normal',
+    'normal': 0,
     
-    'back': 'attack',
-    'land': 'attack',
-    'neptune': 'attack',
-    'pod': 'attack',
-    'smurf': 'attack',
-    'teardrop': 'attack',
-    'mailbomb': 'attack',
-    'apache2': 'attack',
-    'processtable': 'attack',
-    'udpstorm': 'attack',
+    'back': 1,
+    'land': 1,
+    'neptune': 1,
+    'pod': 1,
+    'smurf': 1,
+    'teardrop': 1,
+    'mailbomb':1,
+    'apache2': 1,
+    'processtable': 1,
+    'udpstorm': 1,
     
-    'ipsweep': 'attack',
-    'nmap': 'attack',
-    'portsweep': 'attack',
-    'satan': 'attack',
-    'mscan': 'attack',
-    'saint': 'attack',
+    'ipsweep': 1,
+    'nmap': 1,
+    'portsweep': 1,
+    'satan': 1,
+    'mscan': 1,
+    'saint': 1,
 
-    'ftp_write': 'attack',
-    'guess_passwd': 'attack',
-    'imap': 'attack',
-    'multihop': 'attack',
-    'phf': 'attack',
-    'spy': 'attack',
-    'warezclient': 'attack',
-    'warezmaster': 'attack',
-    'sendmail': 'attack',
-    'named': 'attack',
-    'snmpgetattack': 'attack',
-    'snmpguess': 'attack',
-    'xlock': 'attack',
-    'xsnoop': 'attack',
-    'worm': 'attack',
+    'ftp_write': 1,
+    'guess_passwd': 1,
+    'imap': 1,
+    'multihop': 1,
+    'phf': 1,
+    'spy': 1,
+    'warezclient': 1,
+    'warezmaster': 1,
+    'sendmail': 1,
+    'named': 1,
+    'snmpgetattack': 1,
+    'snmpguess': 1,
+    'xlock': 1,
+    'xsnoop': 1,
+    'worm': 1,
     
-    'buffer_overflow': 'attack',
-    'loadmodule': 'attack',
-    'perl': 'attack',
-    'rootkit': 'attack',
-    'httptunnel': 'attack',
-    'ps': 'attack',    
-    'sqlattack': 'attack',
-    'xterm': 'attack'
+    'buffer_overflow': 1,
+    'loadmodule': 1,
+    'perl': 1,
+    'rootkit': 1,
+    'httptunnel': 1,
+    'ps': 1,    
+    'sqlattack': 1,
+    'xterm': 1
 }
 
 dataframe["labels"] = dataframe["labels"].apply(lambda x: attack_dict_coarse[x])
@@ -158,6 +161,46 @@ for cat in nominal_cols:
     dataframe = dataframe.drop(cat,axis=1)
     dataframe = dataframe.join(one_hot)
 
+newrows,newcols = dataframe.shape
+print newrows,newcols
+one_promille_rowcount = int(round(newrows/1000))
+
+# For all the numerical columns, shave off the rows with the one promille highest and lowest values
+for c in numeric_cols:
+    one_percent_largest = dataframe.nlargest(one_promille_rowcount,c)
+    one_percent_smallest = dataframe.nsmallest(one_promille_rowcount,c)
+    largest_row_indices, _ = one_percent_largest.axes    
+    smallest_row_indices, _ = one_percent_smallest.axes
+    to_drop = set(largest_row_indices) | set(smallest_row_indices)    
+    dataframe = dataframe.drop(to_drop,axis=0)
+    
+
 print dataframe.shape
 
+# Standardization, current formula x-min / max-min
+for c in numeric_cols:
+    mean = dataframe[c].mean()
+    stddev = dataframe[c].std()
+    ma = dataframe[c].max()
+    mi = dataframe[c].min()    
+    print c,"mean:",mean,"stddev:",stddev,"max:",ma,"mi:",mi
+    dataframe[c] = dataframe[c].apply(lambda x: (x-mi)/(ma-mi))
 
+with pandas.option_context('display.max_rows', 10, 'display.max_columns',None):
+    print dataframe[["src_bytes","dst_bytes"]]
+
+label_loc = dataframe.columns.get_loc("labels")
+print "label:",label_loc
+
+array = dataframe.values
+Y = array[:,label_loc]
+X = np.delete(array,label_loc,1)
+test_size = 0.2
+seed = 18168725
+X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X,Y,test_size=test_size,random_state=seed)
+
+neigh = KNeighborsClassifier(n_neighbors=120)
+neigh.fit(X_train,Y_train)
+
+result = neigh.score(X_test,Y_test)
+print result
