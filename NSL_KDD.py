@@ -1,6 +1,9 @@
 #! /usr/bin/python2
 import math
 import itertools
+import random
+import operator
+import sys
 import pandas
 import numpy as np
 import pandas as pd
@@ -195,12 +198,43 @@ print "label:",label_loc
 array = dataframe.values
 Y = array[:,label_loc]
 X = np.delete(array,label_loc,1)
-test_size = 0.2
-seed = 18168725
-X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X,Y,test_size=test_size,random_state=seed)
 
-neigh = KNeighborsClassifier(n_neighbors=120)
-neigh.fit(X_train,Y_train)
+crossed = {}
+for cross in range(0,11):
+    test_size = 0.2
+    seed = int(round(random.random()*1000000))
+    X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X,Y,test_size=test_size,random_state=seed)
 
-result = neigh.score(X_test,Y_test)
-print result
+    for k in range(1,201,4):
+        crossed[k] = []
+
+    for k in range(1,201,4):
+        sys.stdout.write('Round %d, k = %d \r' % (cross,k))        
+        sys.stdout.flush()
+        gt0 = time()
+        neigh = KNeighborsClassifier(n_neighbors=k, p=1, n_jobs=-1)
+        neigh.fit(X_train,Y_train)
+        result = neigh.score(X_test,Y_test)
+        crossed[k].append([result,time()-gt0])
+print
+
+for k in crossed:   
+    accs = [item[0] for item in crossed[k]]
+    times = [item[1] for item in crossed[k]]
+
+    crossed[k] = [np.mean(accs), np.std(accs), np.mean(times), np.std(times)]
+    
+
+validated = sorted(crossed.items(),key=operator.itemgetter(0))
+for topn in range(4):
+    #print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
+    print validated[topn]
+
+''' 
+28min50s runtime for the entire run: 10 rounds of validation, testing k=1 -> k=197
+After 10 fold cross validation it turns out that only looking at the closest neighbour (k=1) yields the best result
+(1, [0.9980980557903635, 0.0, 1.7285821437835693, 0.0])
+(5, [0.9959847844463229, 0.0, 2.0070080757141113, 0.0])
+(9, [0.9955621301775148, 0.0, 2.2154479026794434, 0.0])
+(13, [0.9945054945054945, 0.0, 2.309248208999634, 0.0])
+'''
