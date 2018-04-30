@@ -1,13 +1,14 @@
-#! /usr/bin/python2
+#! /usr/bin/python
 from pyspark import SparkContext
 from pyspark.sql import SQLContext
-from pyspark.mllib.linalg import Vectors
+from pyspark.ml.linalg import Vectors
 
 from pyspark_knn.ml.classification import KNNClassifier
 
 
-# This is a simple test app. Use the following command to run:
-# spark-submit --driver-class-path ../spark-knn-core/target/scala-2.10/spark-knn_*.jar test.py
+# This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
+# spark-submit --py-files python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar --jars spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar YOUR-SCRIPT.py
+
 
 sc = SparkContext(appName='test')
 sqlContext = SQLContext(sc)
