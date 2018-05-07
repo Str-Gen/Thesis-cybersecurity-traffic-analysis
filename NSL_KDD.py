@@ -4,7 +4,6 @@ import itertools
 import random
 import operator
 import sys
-import pandas
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
