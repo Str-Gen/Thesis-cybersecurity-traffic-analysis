@@ -6,17 +6,24 @@ from pyspark.sql.functions import udf, col, create_map, lit
 from pyspark.sql.types import *
 from pyspark.ml.linalg import Vectors, VectorUDT, DenseVector
 from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
 from pyspark_knn.ml.classification import KNNClassifier
+
+from time import time
 import numpy as np
 import pandas as pd
 import random
+import itertools
+import operator
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # spark-submit --py-files python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar --jars spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar YOUR-SCRIPT.py
 
+# local[*] master, * means as many worker threads as there are logical cores on your machine
+sc = SparkContext(appName='lightweight_knn_nslkdd', master='local[*]')
+sc.setLogLevel('ERROR')
 
-sc = SparkContext(appName='test', master='local[4]')
 sqlContext = SQLContext(sc)
 
 # Raw data
@@ -50,7 +57,7 @@ nominal_cols = col_names[nominal_indexes].tolist()
 binary_cols = col_names[binary_indexes].tolist()
 numeric_cols = col_names[numeric_indexes].tolist()
 
-pandas_df = pd.read_csv(train20_nsl_kdd_dataset_path,names=col_names)
+pandas_df = pd.read_csv(train_nsl_kdd_dataset_path,names=col_names)
 
 # Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
 attack_dict_coarse = {
@@ -134,12 +141,12 @@ for cat in nominal_cols:
 pandas_df.fillna(0,inplace=True)
 
 spark_df = sqlContext.createDataFrame(pandas_df)
-print(type(spark_df))
+# print(type(spark_df))
 spark_df.drop('labels_numeric').collect()
 
-print(len(spark_df.columns))
+# print(len(spark_df.columns))
 all_features = [ feature for feature in spark_df.columns if feature != 'labels' ]
-print(len(all_features))
+# print(len(all_features))
 assembler = VectorAssembler( inputCols=all_features, outputCol='features')
 spark_df = assembler.transform(spark_df)
 
@@ -150,28 +157,57 @@ makeDenseUDF = udf(makeDense,VectorUDT())
 spark_df = spark_df.withColumn('features',makeDenseUDF(spark_df.features))
 spark_df_vectorized = spark_df.select('features','labels')
 spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized.labels.cast(DoubleType())).drop('labels')
-spark_df_vectorized.show(truncate=False)
-
-seed = int(round(random.random()*1000000))
-split = (spark_df_vectorized.randomSplit([0.8, 0.2], seed=seed))
-
-scaled_train_df = split[0].cache()
-scaled_train_df.show(truncate=False)
-scaled_cv_df = split[1].cache()
+# spark_df_vectorized.show(truncate=False)
 
 
-print(scaled_train_df.count())
-print(scaled_cv_df.count())
+crossed = {}
+for cross in range(0,11):
+    seed = int(round(random.random()*1000000))
+    split = (spark_df_vectorized.randomSplit([0.8, 0.2], seed=seed))
 
-print('Initializing')
+    scaled_train_df = split[0].cache()
+    # scaled_train_df.show(truncate=False)
+    scaled_cv_df = split[1].cache()     
+    
+    for k in range(1,101,4):
+        crossed[k] = []
+        gt0 = time()
+        print('Initializing')
+        knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
+        # print('Params:', [p.name for p in knn.params])
+        print('Fitting:')
+        model = knn.fit(scaled_train_df)
+        # print('bufferSize:', model._java_obj.getBufferSize())
+        # scaled_cv_df.show(truncate=False)
+        # Don't drop label, need for verification!
+        # scaled_cv_df = scaled_cv_df.drop('label')
+        print('Predicting:')
+        predictions = model.transform(scaled_cv_df)
+        print('Predictions done:')
+        # for row in predictions.collect():
+        #     print(row)
 
-knn = KNNClassifier(k=1, featuresCol='features', labelCol='label')  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] , topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1
-print('Params:', [p.name for p in knn.params])
-print('Fitting')
-model = knn.fit(scaled_train_df)
-print('bufferSize:', model._java_obj.getBufferSize())
-print('Predicting')
-# predictions = model.transform(scaled_cv_df)
-# print('Predictions:')
-# for row in predictions.collect():
-#      print(row)
+        evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+        metric = evaluator.evaluate(predictions)
+
+        print(metric)
+        crossed[k].append([metric,time()-gt0])
+
+for k in crossed:
+    accs = [item[0] for item in crossed[k]]
+    times = [item[1] for item in crossed[k]]
+
+    crossed[k] = [np.mean(accs), np.std(accs), np.mean(times),np.std(times)]
+
+validated = sorted(crossed.items(),key=operator.itemgetter(0))
+for topn in range(4):
+    print(validated[topn])
+
+'''
+3h 7m 24s runtime: 10 rounds of validation, testing k=1->k=97
+After 10 fold cross validation it turns out that only looking at the closest neighbour (k=1) yields the best result
+(1, [0.998621590656475, 0.0, 24.55202031135559, 0.0])
+(5, [0.9976535562473619, 0.0, 17.84294605255127, 0.0])
+(9, [0.9969919818270346, 0.0, 20.179744720458984, 0.0])
+(13, [0.9965387989030701, 0.0, 21.47579026222229, 0.0])
+'''
