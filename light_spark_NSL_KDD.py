@@ -48,8 +48,7 @@ nominal_indexes = [1, 2, 3]
 # All columns with binary values
 binary_indexes = [6, 11, 13, 14, 20, 21]
 # All other columns are numeric data, clever way of differencing, create range, transform it to a set and subtract the other indices, finally convert that to a list
-numeric_indexes = list(set(range(41)).difference(
-    nominal_indexes).difference(binary_indexes))
+numeric_indexes = list(set(range(41)).difference(nominal_indexes).difference(binary_indexes))
 
 # Map the columns types to their name
 # tolist is non-native python, it is available as a function on numpy ndarrays, which col_names is
