@@ -1,15 +1,15 @@
 #! /usr/bin/python
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, col, create_map, lit
-
+from pyspark.sql.functions import udf, col, min
+import pyspark.sql.functions as sql
 from pyspark.sql.types import *
 from pyspark.ml.linalg import Vectors, VectorUDT, DenseVector
-from pyspark.ml.feature import VectorAssembler
+from pyspark.ml import Pipeline, Transformer
+from pyspark.ml.feature import VectorAssembler, StringIndexer, OneHotEncoderEstimator, MinMaxScaler
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
-
 from pyspark_knn.ml.classification import KNNClassifier
-
 from time import time
 import numpy as np
 import pandas as pd
@@ -23,10 +23,16 @@ import operator
 # local[*] master, * means as many worker threads as there are logical cores on your machine
 spark = SparkSession.builder \
         .master('local[*]') \
-        .appName('Word Count') \
-        .config('spark.driver.memory','8g') \
-        .config('spark.evenLog.enabled','true') \
+        .appName('spark_knn_nslkdd') \
         .getOrCreate()
+        # .config('spark.driver.memory','12g') \
+        # .config('spark.driver.maxResultSize','10g') \
+        # .config('spark.executor.memory','4g') \        
+        # .config('spark.executor.instances','4') \
+        # .config('spark.executor.cores','4') \
+        # .getOrCreate()
+
+
 
 # Raw data
 train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
@@ -59,204 +65,151 @@ nominal_cols = col_names[nominal_indexes].tolist()
 binary_cols = col_names[binary_indexes].tolist()
 numeric_cols = col_names[numeric_indexes].tolist()
 
-schema = StructType([
-    StructField('duration', DoubleType(), True),
-    StructField('protocol_type', StringType(), True),
-    StructField('service', StringType(), True),
-    StructField('flag', StringType(), True),
-    StructField('src_bytes', DoubleType(), True),
-    StructField('dst_bytes', DoubleType(), True),
-    StructField('land', DoubleType(), True),
-    StructField('wrong_fragment', DoubleType(), True),
-    StructField('urgent', DoubleType(), True),
-    StructField('hot', DoubleType(), True),
-    StructField('num_failed_logins', DoubleType(), True),
-    StructField('logged_in', DoubleType(), True),
-    StructField('num_comprised', DoubleType(), True),
-    StructField('root_shell', DoubleType(), True),
-    StructField('su_attempted', DoubleType(), True),
-    StructField('num_root', DoubleType(), True),
-    StructField('num_file_creations', DoubleType(), True),
-    StructField('num_shells', DoubleType(), True),
-    StructField('num_access_files', DoubleType(), True),
-    StructField('num_outbound_cmds', DoubleType(), True),
-    StructField('is_host_login', DoubleType(), True),
-    StructField('is_guest_login', DoubleType(), True),
-    StructField('count', DoubleType(), True),
-    StructField('srv_count', DoubleType(), True),
-    StructField('serror_rate', DoubleType(), True),
-    StructField('srv_serror_rate', DoubleType(), True),
-    StructField('rerror_rate', DoubleType(), True),
-    StructField('srv_rerror_rate', DoubleType(), True),
-    StructField('same_srv_rate', DoubleType(), True),
-    StructField('diff_srv_rate', DoubleType(), True),
-    StructField('srv_diff_host_rate', DoubleType(), True),
-    StructField('dst_host_count', DoubleType(), True),
-    StructField('dst_host_srv_count', DoubleType(), True),
-    StructField('dst_host_same_srv_rate', DoubleType(), True),
-    StructField('dst_host_diff_srv_rate', DoubleType(), True),
-    StructField('dst_host_same_src_port_rate', DoubleType(), True),
-    StructField('dst_host_srv_diff_host_rate', DoubleType(), True),
-    StructField('dst_host_serror_rate', DoubleType(), True),
-    StructField('dst_host_srv_serror_rate', DoubleType(), True),
-    StructField('dst_host_rerror_rate', DoubleType(), True),
-    StructField('dst_host_srv_rerror_rate', DoubleType(), True),
-    StructField('labels', DoubleType(), True),
-    StructField('labels_numeric', DoubleType(), True)
-    ])
+def read_dataset_typed(path):
+    schema = StructType([
+        StructField('duration', DoubleType(), True),
+        StructField('protocol_type', StringType(), True),
+        StructField('service', StringType(), True),
+        StructField('flag', StringType(), True),
+        StructField('src_bytes', DoubleType(), True),
+        StructField('dst_bytes', DoubleType(), True),
+        StructField('land', DoubleType(), True),
+        StructField('wrong_fragment', DoubleType(), True),
+        StructField('urgent', DoubleType(), True),
+        StructField('hot', DoubleType(), True),
+        StructField('num_failed_logins', DoubleType(), True),
+        StructField('logged_in', DoubleType(), True),
+        StructField('num_compromised', DoubleType(), True),
+        StructField('root_shell', DoubleType(), True),
+        StructField('su_attempted', DoubleType(), True),
+        StructField('num_root', DoubleType(), True),
+        StructField('num_file_creations', DoubleType(), True),
+        StructField('num_shells', DoubleType(), True),
+        StructField('num_access_files', DoubleType(), True),
+        StructField('num_outbound_cmds', DoubleType(), True),
+        StructField('is_host_login', DoubleType(), True),
+        StructField('is_guest_login', DoubleType(), True),
+        StructField('count', DoubleType(), True),
+        StructField('srv_count', DoubleType(), True),
+        StructField('serror_rate', DoubleType(), True),
+        StructField('srv_serror_rate', DoubleType(), True),
+        StructField('rerror_rate', DoubleType(), True),
+        StructField('srv_rerror_rate', DoubleType(), True),
+        StructField('same_srv_rate', DoubleType(), True),
+        StructField('diff_srv_rate', DoubleType(), True),
+        StructField('srv_diff_host_rate', DoubleType(), True),
+        StructField('dst_host_count', DoubleType(), True),
+        StructField('dst_host_srv_count', DoubleType(), True),
+        StructField('dst_host_same_srv_rate', DoubleType(), True),
+        StructField('dst_host_diff_srv_rate', DoubleType(), True),
+        StructField('dst_host_same_src_port_rate', DoubleType(), True),
+        StructField('dst_host_srv_diff_host_rate', DoubleType(), True),
+        StructField('dst_host_serror_rate', DoubleType(), True),
+        StructField('dst_host_srv_serror_rate', DoubleType(), True),
+        StructField('dst_host_rerror_rate', DoubleType(), True),
+        StructField('dst_host_srv_rerror_rate', DoubleType(), True),
+        StructField('labels', StringType(), True),
+        StructField('labels_numeric', DoubleType(), True)
+        ])
 
-df = spark.read.csv(train_nsl_kdd_dataset_path,schema=schema,mode='FAILFAST')
-print(df.dtypes)
+    return spark.read.csv(path,schema=schema,mode='FAILFAST')
 
-# Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
-attack_dict_coarse = {
-    'normal': 0.0,
+# A custom transform
+class Attack2DTransformer(Transformer):    
+    def __init__(self):
+        super(Attack2DTransformer,self).__init__()
+    def _transform(self,dataset):
+        # regex: match full line ^$, match any character any nr of times .*, look ahead and if the word normal is matched, then fail the match
+        # what it does: everything on a line in the labels column that isn't the word normal replace with the word attack, removing the distinct categories of attacks
+        return dataset.withColumn('2DAttackLabel',sql.regexp_replace(col('labels'),'^(?!normal).*$','attack'))
 
-    'back': 1.0,
-    'land': 1.0,
-    'neptune': 1.0,
-    'pod': 1.0,
-    'smurf': 1.0,
-    'teardrop': 1.0,
-    'mailbomb': 1.0,
-    'apache2': 1.0,
-    'processtable': 1.0,
-    'udpstorm': 1.0,
+# Followed by a StringIndexer, which takes the available strings in a column ranks them by number of appearances and then gives each string a number
+# 1.0 for the string with the most occurrences (default), 2.0 for 2nd most and so on
+label2DIndexer = StringIndexer(inputCol='2DAttackLabel',outputCol='index_2DAttackLabel')
 
-    'ipsweep': 1.0,
-    'nmap': 1.0,
-    'portsweep': 1.0,
-    'satan': 1.0,
-    'mscan': 1.0,
-    'saint': 1.0,
+# Pack the 2D string transform and subsequent indexing transform into a unit, Pipeline
+mapping2DPipeline = Pipeline(stages=[Attack2DTransformer(),label2DIndexer])
 
-    'ftp_write': 1.0,
-    'guess_passwd': 1.0,
-    'imap': 1.0,
-    'multihop': 1.0,
-    'phf': 1.0,
-    'spy': 1.0,
-    'warezclient': 1.0,
-    'warezmaster': 1.0,
-    'sendmail': 1.0,
-    'named': 1.0,
-    'snmpgetattack': 1.0,
-    'snmpguess': 1.0,
-    'xlock': 1.0,
-    'xsnoop': 1.0,
-    'worm': 1.0,
+t0 = time()
+train_df = read_dataset_typed(train_nsl_kdd_dataset_path)
+train_df = mapping2DPipeline.fit(train_df).transform(train_df)
+train_df = train_df.drop('labels','labels_numeric','2DAttackLabel')
+train_df = train_df.withColumnRenamed('index_2DAttackLabel','label')
+train_df = train_df.cache()
+train_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
 
-    'buffer_overflow': 1.0,
-    'loadmodule': 1.0,
-    'perl': 1.0,
-    'rootkit': 1.0,
-    'httptunnel': 1.0,
-    'ps': 1.0,
-    'sqlattack': 1.0,
-    'xterm': 1.0
-}
+t0 = time()
+test_df = read_dataset_typed(test_nsl_kdd_dataset_path)
+test_df = mapping2DPipeline.fit(test_df).transform(test_df)
+test_df = test_df.drop('labels','labels_numeric','2DAttackLabel')
+test_df = test_df.withColumnRenamed('index_2DAttackLabel','label')
+test_df = test_df.cache()
+test_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
 
-# # Label all normal = 0, all attacks = 1
-# pandas_df["labels"] = pandas_df["labels"].apply(lambda x: attack_dict_coarse[x])
+t0 = time()
+idxs = [StringIndexer(inputCol=c,outputCol=c+'_index') for c in nominal_cols]
+ohes = [OneHotEncoderEstimator(inputCols=[c+'_index'],outputCols=[c+'_numeric'],dropLast=False) for c in nominal_cols]
+idxs.extend(ohes)
+OhePipeline = Pipeline(stages=idxs)
+train_df = OhePipeline.fit(train_df).transform(train_df)
+train_df = train_df.drop(*nominal_cols)
+train_df = train_df.cache()
+train_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
 
+t0 = time()
+vect_numeric = [VectorAssembler(inputCols=[c],outputCol=c+'_vec') for c in numeric_cols ]
+scls_nominal = [MinMaxScaler(inputCol=c,outputCol=c+'_scaled') for c in [x+'_numeric' for x in nominal_cols] ]
+scls_numeric = [MinMaxScaler(inputCol=c+'_vec',outputCol=c+'_scaled') for c in numeric_cols ]
+vect_numeric.extend(scls_numeric)
+vect_numeric.extend(scls_nominal)
+SclPipeline = Pipeline(stages=vect_numeric)
+train_df = SclPipeline.fit(train_df).transform(train_df)
+train_df = train_df.drop(*numeric_cols)
+for x in nominal_cols:
+    train_df = train_df.drop(x+'_numeric',x+'_index')
+train_df = train_df.cache()
+train_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
 
-# newrows,newcols = pandas_df.shape
-# one_promille_rowcount = int(round(newrows/1000))
-# # For all the numerical columns, shave off the rows with the one promille highest and lowest values
-# for c in numeric_cols:
-#     one_percent_largest = pandas_df.nlargest(one_promille_rowcount,c)
-#     one_percent_smallest = pandas_df.nsmallest(one_promille_rowcount,c)
-#     largest_row_indices, _ = one_percent_largest.axes    
-#     smallest_row_indices, _ = one_percent_smallest.axes
-#     to_drop = set(largest_row_indices) | set(smallest_row_indices)    
-#     pandas_df = pandas_df.drop(to_drop,axis=0)
+t0 = time()
+all_features = [ feature for feature in train_df.columns if feature != 'label' ]
+assembler = VectorAssembler( inputCols=all_features, outputCol='features')
+train_df = assembler.transform(train_df)
+drop_columns = [ drop for drop in train_df.columns if drop != 'label' and drop != 'features' ]
+train_df = train_df.drop(*drop_columns)
+train_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
 
-# # Standardization, current formula x-min / max-min
-# for c in numeric_cols:
-#     # mean = dataframe[c].mean()
-#     # stddev = dataframe[c].std()
-#     ma = pandas_df[c].max()
-#     mi = pandas_df[c].min()    
-#     pandas_df[c] = pandas_df[c].apply(lambda x: (x-mi)/(ma-mi))
+t0 = time()
+def makeDense(v):
+    return Vectors.dense(v.toArray())
+makeDenseUDF = udf(makeDense,VectorUDT())
 
+train_df = train_df.withColumn('features',makeDenseUDF(train_df.features))
+train_df_vectorized = train_df.select('features','label')
+train_df.show(n=5,truncate=False,vertical=True)
+print(time()-t0)
+print(train_df.dtypes)
 
-# # one hot encoding for categorical features
-# for cat in nominal_cols:
-#     one_hot = pd.get_dummies(pandas_df[cat])    
-#     pandas_df = pandas_df.drop(cat,axis=1)
-#     pandas_df = pandas_df.join(one_hot)
+t0 = time()
+knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1)
+grid = ParamGridBuilder().addGrid(knn.k,range(1,10,4)).build()
+evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+print(train_df.count())
+cvModel = cv.fit(train_df)
+result = evaluator.evaluate(cvModel.transform(train_df))
+print(result,'in',time()-t0)
 
-# # Replace any NaN with 0
-# pandas_df.fillna(0,inplace=True)
-
-# spark_df = sqlContext.createDataFrame(pandas_df)
-# # print(type(spark_df))
-# spark_df.drop('labels_numeric').collect()
-
-# # print(len(spark_df.columns))
-# all_features = [ feature for feature in spark_df.columns if feature != 'labels' ]
-# # print(len(all_features))
-# assembler = VectorAssembler( inputCols=all_features, outputCol='features')
-# spark_df = assembler.transform(spark_df)
-
-# def makeDense(v):
-#     return Vectors.dense(v.toArray())
-# makeDenseUDF = udf(makeDense,VectorUDT())
-
-# spark_df = spark_df.withColumn('features',makeDenseUDF(spark_df.features))
-# spark_df_vectorized = spark_df.select('features','labels')
-# spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized.labels.cast(DoubleType())).drop('labels')
-# spark_df_vectorized.show(truncate=False)
-
-
-# crossed = {}
-# for cross in range(0,11):
-#     seed = int(round(random.random()*1000000))
-#     split = (spark_df_vectorized.randomSplit([0.8, 0.2], seed=seed))
-
-#     scaled_train_df = split[0].cache()
-#     # scaled_train_df.show(truncate=False)
-#     scaled_cv_df = split[1].cache()     
-    
-#     for k in range(1,101,4):
-#         crossed[k] = []
-#         gt0 = time()
-#         print('Initializing')
-#         knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
-#         # print('Params:', [p.name for p in knn.params])
-#         print('Fitting:')
-#         model = knn.fit(scaled_train_df)
-#         # print('bufferSize:', model._java_obj.getBufferSize())
-#         # scaled_cv_df.show(truncate=False)
-#         # Don't drop label, need for verification!
-#         # scaled_cv_df = scaled_cv_df.drop('label')
-#         print('Predicting:')
-#         predictions = model.transform(scaled_cv_df)
-#         print('Predictions done:')
-#         # for row in predictions.collect():
-#         #     print(row)
-
-#         evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
-#         metric = evaluator.evaluate(predictions)
-
-#         print(metric)
-#         crossed[k].append([metric,time()-gt0])
-
-# for k in crossed:
-#     accs = [item[0] for item in crossed[k]]
-#     times = [item[1] for item in crossed[k]]
-
-#     crossed[k] = [np.mean(accs), np.std(accs), np.mean(times),np.std(times)]
-
-# validated = sorted(crossed.items(),key=operator.itemgetter(0))
-# for topn in range(4):
-#     print(validated[topn])
-
-'''
-3h 7m 24s runtime: 10 rounds of validation, testing k=1->k=97
-After 10 fold cross validation it turns out that only looking at the closest neighbour (k=1) yields the best result
-(1, [0.998621590656475, 0.0, 24.55202031135559, 0.0])
-(5, [0.9976535562473619, 0.0, 17.84294605255127, 0.0])
-(9, [0.9969919818270346, 0.0, 20.179744720458984, 0.0])
-(13, [0.9965387989030701, 0.0, 21.47579026222229, 0.0])
-'''
+# # def top_df_percent(df,key_col,k):
+# #     num_records = df.count()
+# #     k_percent_values = (df
+# #                         .orderBy(col(key_col).desc())
+# #                         .limit(round(num_records * k )))
+# #                         # .select(min(key_col).alias('min'))
+# #                         # .first()['min'])    
+# #     print(k_percent_values)
+# #     return df.filter(df[key_col] >= k_percent_values)

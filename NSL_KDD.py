@@ -207,7 +207,7 @@ for cross in range(0,11):
     for k in range(1,201,4):
         crossed[k] = []
 
-    for k in range(1,201,4):
+    for k in range(1,101,4):
         sys.stdout.write('Round %d, k = %d \r' % (cross,k))        
         sys.stdout.flush()
         gt0 = time()
