@@ -18,7 +18,7 @@ import itertools
 import operator
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
-# spark-submit --py-files python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar --jars spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar YOUR-SCRIPT.py
+# SPARK_PRINT_LAUNCH_COMMAND=true spark-submit --py-files /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --jars /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --driver-memory 12g --num-executors 4 light_spark_NSL_KDD.py
 
 # local[*] master, * means as many worker threads as there are logical cores on your machine
 sc = SparkContext(appName='lightweight_knn_nslkdd', master='local[*]')
@@ -160,9 +160,9 @@ spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized
 
 
 crossed = {}
-for cross in range(0,11):
+for cross in range(0,3):
     seed = int(round(random.random()*1000000))
-    split = (spark_df_vectorized.randomSplit([0.8, 0.2], seed=seed))
+    split = (spark_df_vectorized.randomSplit([0.67, 0.33], seed=seed))
 
     scaled_train_df = split[0].cache()
     # scaled_train_df.show(truncate=False)
@@ -172,7 +172,7 @@ for cross in range(0,11):
         crossed[k] = []
         gt0 = time()
         print('Initializing')
-        knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
+        knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
         # print('Params:', [p.name for p in knn.params])
         print('Fitting:')
         model = knn.fit(scaled_train_df)
@@ -203,10 +203,10 @@ for topn in range(4):
     print(validated[topn])
 
 '''
-3h 7m 24s runtime: 10 rounds of validation, testing k=1->k=97
-After 10 fold cross validation it turns out that only looking at the closest neighbour (k=1) yields the best result
-(1, [0.998621590656475, 0.0, 24.55202031135559, 0.0])
-(5, [0.9976535562473619, 0.0, 17.84294605255127, 0.0])
-(9, [0.9969919818270346, 0.0, 20.179744720458984, 0.0])
-(13, [0.9965387989030701, 0.0, 21.47579026222229, 0.0])
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4))
+Top 4 results show that k=1 yields the highest accuracy 44min 25s runtime intel core i5 4690 @3.5GHz
+(1, [0.9987006730941386, 0.0, 17.568329334259033, 0.0])
+(5, [0.997514684762422, 0.0, 11.270951271057129, 0.0])
+(9, [0.9965676175259428, 0.0, 13.70993185043335, 0.0])
+(13, [0.9956051353821973, 0.0, 15.49851942062378, 0.0])
 '''

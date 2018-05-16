@@ -195,8 +195,8 @@ print(time()-t0)
 print(train_df.dtypes)
 
 t0 = time()
-knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1, topTreeLeafSize=1, subTreeLeafSize=1)
-grid = ParamGridBuilder().addGrid(knn.k,range(1,10,4)).build()
+knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
+grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
 evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
 cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
 print(train_df.count())
@@ -213,3 +213,9 @@ print(result,'in',time()-t0)
 # #                         # .first()['min'])    
 # #     print(k_percent_values)
 # #     return df.filter(df[key_col] >= k_percent_values)
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4))
+Top result shows that k=1 yields the highest accuracy 1h 8min 4s runtime intel core i5 4690 @3.5GHz
+1, 0.9999447171214529
+'''
