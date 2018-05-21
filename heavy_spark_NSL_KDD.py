@@ -7,7 +7,7 @@ from pyspark.sql.types import *
 from pyspark.ml.linalg import Vectors, VectorUDT, DenseVector
 from pyspark.ml import Pipeline, Transformer
 from pyspark.ml.feature import VectorAssembler, StringIndexer, OneHotEncoderEstimator, MinMaxScaler
-from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder, TrainValidationSplit
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark_knn.ml.classification import KNNClassifier
 from time import time
@@ -31,7 +31,7 @@ spark = SparkSession.builder \
         # .config('spark.executor.instances','4') \
         # .config('spark.executor.cores','4') \
         # .getOrCreate()
-
+spark.sparkContext.setLogLevel("ERROR")
 
 
 # Raw data
@@ -41,8 +41,8 @@ test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
 # 41, 16 or 14 Features (16 will be one hot encoded leading to 95 features)
 F41 = False
-F16 = True
-F14 = False
+F16 = False
+F14 = True
 
 # All columns
 col_names = np.array(["duration", "protocol_type", "service", "flag", "src_bytes",
@@ -234,31 +234,45 @@ print(time()-t0)
 print(train_df.dtypes)
 
 t0 = time()
-knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
-grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
+knn = KNNClassifier(k=1,featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
+#grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
+grid = ParamGridBuilder().build()
 evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
-cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+# BinaryClassificationEvaluator default is areaUnderROC
+evaluator.setMetricName('areaUnderROC')
+#cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
 print(train_df.count())
-cvModel = cv.fit(train_df)
-result = evaluator.evaluate(cvModel.transform(train_df))
-print(result,'in',time()-t0)
-
+#cvModel = cv.fit(train_df)
+ttsModel = tts.fit(train_df)
+#result = evaluator.evaluate(cvModel.transform(train_df))
+result = evaluator.evaluate(ttsModel.transform(train_df))
+print('result:',result,'in',time()-t0)
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
 Top result shows that k=1 yields the highest accuracy 1h 8min 4s runtime intel core i5 4690 @3.5GHz
-1, 0.9999447171214529
+1, 0.9999447171214529 (auROC)
 '''
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 95 features (F16)
 Top 4 results show that k=1 yields the highest accuracy 53min 59s runtime intel core i5 4690 @3.5GHz
-1, 0.9994427576919176
+1, 0.9994427576919176 (auROC)
 '''
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 14 features (F14)
 Top 4 results show that k=1 yields the highest accuracy 49min 1s runtime intel core i5 4690 @3.5GHz
-1, 0.9986304780573146
+1, 0.9986304780573146 (auROC)
 '''
 
+'''
+Full dataset, 2/3 train, 1/3 test, k=1
+F14: auPR: 0.998417467440286 1m 10s
+F16: auPR: 0.999231174454344 1m 31s
+F41: auPR: 0.9999181015921388 3m 19s
+F14: auROC: 0.9986304780573146 57s
+F16: auROC: 0.9994427576919176 1m 22s
+F41: auROC: 0.9999447171214529 3m 14s
+'''
