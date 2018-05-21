@@ -31,6 +31,11 @@ train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
+# 41, 16 or 14 Features (16 will be one hot encoded leading to 95 features)
+F41 = False
+F16 = False
+F14 = True
+
 # All columns
 col_names = np.array(["duration", "protocol_type", "service", "flag", "src_bytes",
                       "dst_bytes", "land", "wrong_fragment", "urgent", "hot", "num_failed_logins",
@@ -57,6 +62,42 @@ binary_cols = col_names[binary_indexes].tolist()
 numeric_cols = col_names[numeric_indexes].tolist()
 
 pandas_df = pd.read_csv(train_nsl_kdd_dataset_path,names=col_names)
+pandas_df = pandas_df.drop('labels_numeric',axis=1)
+
+if F14:
+    relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    relevant14 = np.append(relevant14,['labels'])
+    numeric_indexes = list(range(14))
+    numeric_cols = relevant14[numeric_indexes].tolist() 
+    pandas_df = pandas_df[relevant14]
+
+if F16:
+    relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    relevant16 = np.append(relevant16,['labels'])
+    nominal_indexes = [0,1]
+    numeric_indexes = list(set(range(16)).difference(nominal_indexes))
+    nominal_cols = relevant16[nominal_indexes].tolist()
+    numeric_cols = relevant16[numeric_indexes].tolist()
+    pandas_df = pandas_df[relevant16]
+
+    # one hot encoding for categorical features
+    for cat in nominal_cols:
+        one_hot = pd.get_dummies(pandas_df[cat])    
+        pandas_df = pandas_df.drop(cat,axis=1)
+        pandas_df = pandas_df.join(one_hot)
+
+if F41:
+    # one hot encoding for categorical features
+    for cat in nominal_cols:
+        one_hot = pd.get_dummies(pandas_df[cat])    
+        pandas_df = pandas_df.drop(cat,axis=1)
+        pandas_df = pandas_df.join(one_hot)
+# with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
+#     print pandas_df
 
 # Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
 attack_dict_coarse = {
@@ -109,18 +150,6 @@ attack_dict_coarse = {
 # Label all normal = 0, all attacks = 1
 pandas_df["labels"] = pandas_df["labels"].apply(lambda x: attack_dict_coarse[x])
 
-
-newrows,newcols = pandas_df.shape
-one_promille_rowcount = int(round(newrows/1000))
-# For all the numerical columns, shave off the rows with the one promille highest and lowest values
-for c in numeric_cols:
-    one_percent_largest = pandas_df.nlargest(one_promille_rowcount,c)
-    one_percent_smallest = pandas_df.nsmallest(one_promille_rowcount,c)
-    largest_row_indices, _ = one_percent_largest.axes    
-    smallest_row_indices, _ = one_percent_smallest.axes
-    to_drop = set(largest_row_indices) | set(smallest_row_indices)    
-    pandas_df = pandas_df.drop(to_drop,axis=0)
-
 # Standardization, current formula x-min / max-min
 for c in numeric_cols:
     # mean = dataframe[c].mean()
@@ -130,18 +159,11 @@ for c in numeric_cols:
     pandas_df[c] = pandas_df[c].apply(lambda x: (x-mi)/(ma-mi))
 
 
-# one hot encoding for categorical features
-for cat in nominal_cols:
-    one_hot = pd.get_dummies(pandas_df[cat])    
-    pandas_df = pandas_df.drop(cat,axis=1)
-    pandas_df = pandas_df.join(one_hot)
-
 # Replace any NaN with 0
 pandas_df.fillna(0,inplace=True)
 
 spark_df = sqlContext.createDataFrame(pandas_df)
 # print(type(spark_df))
-spark_df.drop('labels_numeric').collect()
 
 # print(len(spark_df.columns))
 all_features = [ feature for feature in spark_df.columns if feature != 'labels' ]
@@ -203,10 +225,41 @@ for topn in range(4):
     print(validated[topn])
 
 '''
-Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4))
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
 Top 4 results show that k=1 yields the highest accuracy 44min 25s runtime intel core i5 4690 @3.5GHz
 (1, [0.9987006730941386, 0.0, 17.568329334259033, 0.0])
 (5, [0.997514684762422, 0.0, 11.270951271057129, 0.0])
 (9, [0.9965676175259428, 0.0, 13.70993185043335, 0.0])
 (13, [0.9956051353821973, 0.0, 15.49851942062378, 0.0])
 '''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 95 features (F16)
+Top 4 results show that k=1 yields the highest accuracy 39min 48s runtime intel core i5 4690 @3.5GHz
+(1, [0.9941603871380875, 0.0, 16.67420744895935, 0.0])
+(5, [0.9924833333810361, 0.0, 9.670020818710327, 0.0])
+(9, [0.9910571606236108, 0.0, 11.946027755737305, 0.0])
+(13, [0.9901976184745408, 0.0, 13.429111957550049, 0.0])
+'''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 14 features (F14)
+Top 4 results show that k=1 yields the highest accuracy 28min 48s runtime intel core i5 4690 @3.5GHz
+(1, [0.9828101897880964, 0.0, 9.665040016174316, 0.0])
+(5, [0.9782750353252064, 0.0, 6.7242395877838135, 0.0])
+(9, [0.9762068651232392, 0.0, 8.55370044708252, 0.0])
+(13, [0.9743859583347232, 0.0, 9.539605140686035, 0.0])
+'''
+
+
+# OLD STEP
+# newrows,newcols = pandas_df.shape
+# one_promille_rowcount = int(round(newrows/1000))
+# # For all the numerical columns, shave off the rows with the one promille highest and lowest values
+# for c in numeric_cols:
+#     one_percent_largest = pandas_df.nlargest(one_promille_rowcount,c)
+#     one_percent_smallest = pandas_df.nsmallest(one_promille_rowcount,c)
+#     largest_row_indices, _ = one_percent_largest.axes    
+#     smallest_row_indices, _ = one_percent_smallest.axes
+#     to_drop = set(largest_row_indices) | set(smallest_row_indices)    
+#     pandas_df = pandas_df.drop(to_drop,axis=0)

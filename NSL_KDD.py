@@ -21,6 +21,13 @@ train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
+# 41, 16 or 14 Features 
+# 16 after one hot encoding leads to 95 features
+# 41 after one hot encoding leads to 122 features
+F41 = False
+F16 = True
+F14 = False
+
 # All columns
 col_names = np.array(["duration","protocol_type","service","flag","src_bytes",
     "dst_bytes","land","wrong_fragment","urgent","hot","num_failed_logins",
@@ -32,8 +39,6 @@ col_names = np.array(["duration","protocol_type","service","flag","src_bytes",
     "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
     "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
     "dst_host_rerror_rate","dst_host_srv_rerror_rate","labels","labels_numeric"])
-
-
 
 # All columns with nominal values (strings)
 nominal_indexes = [1,2,3]
@@ -49,9 +54,42 @@ binary_cols = col_names[binary_indexes].tolist()
 numeric_cols = col_names[numeric_indexes].tolist()
 
 dataframe = pd.read_csv(train_nsl_kdd_dataset_path,names=col_names)
+dataframe = dataframe.drop('labels_numeric',axis=1)
 
-with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
-    print dataframe
+if F14:
+    relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    relevant14 = np.append(relevant14,['labels'])
+    numeric_indexes = list(range(14))
+    numeric_cols = relevant14[numeric_indexes].tolist()    
+    dataframe = dataframe[relevant14]
+
+if F16:
+    relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    relevant16 = np.append(relevant16,['labels'])
+    nominal_indexes = [0,1]
+    numeric_indexes = list(set(range(16)).difference(nominal_indexes))
+    nominal_cols = relevant16[nominal_indexes].tolist()
+    numeric_cols = relevant16[numeric_indexes].tolist()
+    dataframe = dataframe[relevant16]
+
+    # one hot encoding for categorical features
+    for cat in nominal_cols:
+        one_hot = pd.get_dummies(dataframe[cat])    
+        dataframe = dataframe.drop(cat,axis=1)
+        dataframe = dataframe.join(one_hot)
+if F41:
+    # one hot encoding for categorical features
+    for cat in nominal_cols:
+        one_hot = pd.get_dummies(dataframe[cat])    
+        dataframe = dataframe.drop(cat,axis=1)
+        dataframe = dataframe.join(one_hot)
+
+# with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
+#     print dataframe
 
 # Coarse grained dictionary of the attack types, every packet will be normal or is an attack, without further distinction
 attack_dict_coarse = {
@@ -103,8 +141,85 @@ attack_dict_coarse = {
 
 dataframe["labels"] = dataframe["labels"].apply(lambda x: attack_dict_coarse[x])
 
+# with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
+#     print dataframe["labels"]
+
+# Standardization, current formula x-min / max-min
+for c in numeric_cols:
+    mean = dataframe[c].mean()
+    stddev = dataframe[c].std()
+    ma = dataframe[c].max()
+    mi = dataframe[c].min()    
+    print c,"mean:",mean,"stddev:",stddev,"max:",ma,"mi:",mi
+    dataframe[c] = dataframe[c].apply(lambda x: (x-mi)/(ma-mi))
+
 with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
-    print dataframe["labels"]
+    print dataframe
+
+label_loc = dataframe.columns.get_loc('labels')
+array = dataframe.values
+Y = array[:,label_loc]
+X = np.delete(array,label_loc,1)
+
+crossed = {}
+for cross in range(0,3):
+    test_size = 0.33
+    seed = int(round(random.random()*1000000))
+    X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X,Y,test_size=test_size,random_state=seed)
+
+    for k in range(1,101,4):
+        crossed[k] = []
+
+    for k in range(1,101,4):
+        sys.stdout.write('Round %d, k = %d \r' % (cross,k))        
+        sys.stdout.flush()
+        gt0 = time()
+        neigh = KNeighborsClassifier(n_neighbors=k, p=1, n_jobs=-1)
+        neigh.fit(X_train,Y_train)
+        result = neigh.score(X_test,Y_test)
+        crossed[k].append([result,time()-gt0])
+print
+
+for k in crossed:   
+    accs = [item[0] for item in crossed[k]]
+    times = [item[1] for item in crossed[k]]
+
+    crossed[k] = [np.mean(accs), np.std(accs), np.mean(times), np.std(times)]
+    
+
+validated = sorted(crossed.items(),key=operator.itemgetter(0))
+for topn in range(4):
+    #print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
+    print validated[topn]
+
+''' 
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features
+Top 4 results show that k=1 yields the highest accuracy 2h 37min 33s runtime intel core i5 4690 @3.5GHz
+(1, [0.9923987299143654, 0.0, 112.55825209617615, 0.0])
+(5, [0.9936255171750217, 0.0, 115.87367391586304, 0.0])
+(9, [0.9934330799576638, 0.0, 117.78476095199585, 0.0])
+(13, [0.9925911671317232, 0.0, 119.15998601913452, 0.0])
+'''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 95 features
+Top 4 results show that k=1 yields the highest accuracy in 1h 53m 29s runtime intel core i5 4690 @3.5GHz
+(1, [0.9892475704801309, 0.0, 79.29528713226318, 0.0])
+(5, [0.9889348600019243, 0.0, 82.02173614501953, 0.0])
+(9, [0.9886462041758877, 0.0, 83.00117683410645, 0.0])
+(13, [0.9880207832194746, 0.0, 83.99710416793823, 0.0])
+'''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 14 features
+Top 4 results show that k=1 yields the highest accuracy 47min 43s runtime intel core i5 4690 @3.5GHz
+(1, [0.9552824016164726, 0.0, 39.16615080833435, 0.0])
+(5, [0.9393822765322813, 0.0, 39.58459210395813, 0.0])
+(9, [0.9554507841816607, 0.0, 40.0942759513855, 0.0])
+(13, [0.9554748388338304, 0.0, 40.25523495674133, 0.0])
+'''
+
+
 
 # Fine-grained dictionary, packets are normal or attacks, and the attacks are divided into 4 subcategories
 
@@ -156,87 +271,18 @@ attack_dict = {
     'xterm': 'U2R'
 }
 
+# OLD STEP
+# newrows,newcols = dataframe.shape
+# # print newrows,newcols
+# one_promille_rowcount = int(round(newrows/1000))
 
-# one hot encoding for categorical features
-for cat in nominal_cols:
-    one_hot = pd.get_dummies(dataframe[cat])    
-    dataframe = dataframe.drop(cat,axis=1)
-    dataframe = dataframe.join(one_hot)
-
-newrows,newcols = dataframe.shape
-# print newrows,newcols
-one_promille_rowcount = int(round(newrows/1000))
-
-# For all the numerical columns, shave off the rows with the one promille highest and lowest values
-for c in numeric_cols:
-    one_percent_largest = dataframe.nlargest(one_promille_rowcount,c)
-    one_percent_smallest = dataframe.nsmallest(one_promille_rowcount,c)
-    largest_row_indices, _ = one_percent_largest.axes    
-    smallest_row_indices, _ = one_percent_smallest.axes
-    to_drop = set(largest_row_indices) | set(smallest_row_indices)    
-    dataframe = dataframe.drop(to_drop,axis=0)   
+# # For all the numerical columns, shave off the rows with the one promille highest and lowest values
+# for c in numeric_cols:
+#     one_percent_largest = dataframe.nlargest(one_promille_rowcount,c)
+#     one_percent_smallest = dataframe.nsmallest(one_promille_rowcount,c)
+#     largest_row_indices, _ = one_percent_largest.axes    
+#     smallest_row_indices, _ = one_percent_smallest.axes
+#     to_drop = set(largest_row_indices) | set(smallest_row_indices)    
+#     dataframe = dataframe.drop(to_drop,axis=0)   
 
 # print dataframe.shape
-
-# Standardization, current formula x-min / max-min
-for c in numeric_cols:
-    mean = dataframe[c].mean()
-    stddev = dataframe[c].std()
-    ma = dataframe[c].max()
-    mi = dataframe[c].min()    
-    print c,"mean:",mean,"stddev:",stddev,"max:",ma,"mi:",mi
-    dataframe[c] = dataframe[c].apply(lambda x: (x-mi)/(ma-mi))
-
-# with pd.option_context('display.max_rows', 10, 'display.max_columns',None):
-#     print dataframe[["src_bytes","dst_bytes"]]
-
-dataframe = dataframe.drop('labels_numeric',axis=1)
-label_loc = dataframe.columns.get_loc("labels")
-# print "label:",label_loc
-
-with pd.option_context('display.max_rows', 5, 'display.max_columns',None):
-     print dataframe
-
-array = dataframe.values
-Y = array[:,label_loc]
-X = np.delete(array,label_loc,1)
-
-crossed = {}
-for cross in range(0,3):
-    test_size = 0.33
-    seed = int(round(random.random()*1000000))
-    X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X,Y,test_size=test_size,random_state=seed)
-
-    for k in range(1,101,4):
-        crossed[k] = []
-
-    for k in range(1,101,4):
-        sys.stdout.write('Round %d, k = %d \r' % (cross,k))        
-        sys.stdout.flush()
-        gt0 = time()
-        neigh = KNeighborsClassifier(n_neighbors=k, p=1, n_jobs=-1)
-        neigh.fit(X_train,Y_train)
-        result = neigh.score(X_test,Y_test)
-        crossed[k].append([result,time()-gt0])
-print
-
-for k in crossed:   
-    accs = [item[0] for item in crossed[k]]
-    times = [item[1] for item in crossed[k]]
-
-    crossed[k] = [np.mean(accs), np.std(accs), np.mean(times), np.std(times)]
-    
-
-validated = sorted(crossed.items(),key=operator.itemgetter(0))
-for topn in range(4):
-    #print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
-    print validated[topn]
-
-''' 
-Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4))
-Top 4 results show that k=1 yields the highest accuracy 2h 48min 17s runtime intel core i5 4690 @3.5GHz
-(1, [0.9934687395948057, 0.0, 118.95463109016418, 0.0])
-(5, [0.9922649386573777, 0.0, 122.42341589927673, 0.0])
-(9, [0.9919319724406424, 0.0, 124.16440296173096, 0.0])
-(13, [0.9924698409445996, 0.0, 125.83885598182678, 0.0])
-'''

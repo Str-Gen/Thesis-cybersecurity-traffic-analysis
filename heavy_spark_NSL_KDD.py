@@ -39,6 +39,11 @@ train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
+# 41, 16 or 14 Features (16 will be one hot encoded leading to 95 features)
+F41 = False
+F16 = True
+F14 = False
+
 # All columns
 col_names = np.array(["duration", "protocol_type", "service", "flag", "src_bytes",
                       "dst_bytes", "land", "wrong_fragment", "urgent", "hot", "num_failed_logins",
@@ -148,16 +153,50 @@ test_df = test_df.cache()
 test_df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
 
-t0 = time()
-idxs = [StringIndexer(inputCol=c,outputCol=c+'_index') for c in nominal_cols]
-ohes = [OneHotEncoderEstimator(inputCols=[c+'_index'],outputCols=[c+'_numeric'],dropLast=False) for c in nominal_cols]
-idxs.extend(ohes)
-OhePipeline = Pipeline(stages=idxs)
-train_df = OhePipeline.fit(train_df).transform(train_df)
-train_df = train_df.drop(*nominal_cols)
-train_df = train_df.cache()
-train_df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
+if F14:
+    t0 = time()
+    relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    #relevant14 = np.append(relevant14,['label'])
+    train_df = train_df.select(*relevant14,'label')
+    numeric_cols = relevant14.tolist()
+    nominal_cols = []
+    print(time()-t0)
+
+if F16:
+    t0 = time()
+    relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
+    'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
+    'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
+    #relevant16 = np.append(relevant16,['label'])
+    train_df = train_df.select(*relevant16,'label')
+    nominal_indexes = [0,1]
+    numeric_indexes = list(set(range(16)).difference(nominal_indexes))
+    nominal_cols = relevant16[nominal_indexes].tolist()
+    numeric_cols = relevant16[numeric_indexes].tolist()
+    idxs = [StringIndexer(inputCol=c,outputCol=c+'_index') for c in nominal_cols]
+    ohes = [OneHotEncoderEstimator(inputCols=[c+'_index'],outputCols=[c+'_numeric'],dropLast=False) for c in nominal_cols]
+    idxs.extend(ohes)
+    OhePipeline = Pipeline(stages=idxs)
+    train_df = OhePipeline.fit(train_df).transform(train_df)
+    train_df = train_df.drop(*nominal_cols)
+    train_df = train_df.cache()
+    train_df.show(n=5,truncate=False,vertical=True)
+    print(time()-t0)
+
+
+if F41:
+    t0 = time()
+    idxs = [StringIndexer(inputCol=c,outputCol=c+'_index') for c in nominal_cols]
+    ohes = [OneHotEncoderEstimator(inputCols=[c+'_index'],outputCols=[c+'_numeric'],dropLast=False) for c in nominal_cols]
+    idxs.extend(ohes)
+    OhePipeline = Pipeline(stages=idxs)
+    train_df = OhePipeline.fit(train_df).transform(train_df)
+    train_df = train_df.drop(*nominal_cols)
+    train_df = train_df.cache()
+    train_df.show(n=5,truncate=False,vertical=True)
+    print(time()-t0)
 
 t0 = time()
 vect_numeric = [VectorAssembler(inputCols=[c],outputCol=c+'_vec') for c in numeric_cols ]
@@ -204,18 +243,22 @@ cvModel = cv.fit(train_df)
 result = evaluator.evaluate(cvModel.transform(train_df))
 print(result,'in',time()-t0)
 
-# # def top_df_percent(df,key_col,k):
-# #     num_records = df.count()
-# #     k_percent_values = (df
-# #                         .orderBy(col(key_col).desc())
-# #                         .limit(round(num_records * k )))
-# #                         # .select(min(key_col).alias('min'))
-# #                         # .first()['min'])    
-# #     print(k_percent_values)
-# #     return df.filter(df[key_col] >= k_percent_values)
 
 '''
-Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4))
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
 Top result shows that k=1 yields the highest accuracy 1h 8min 4s runtime intel core i5 4690 @3.5GHz
 1, 0.9999447171214529
 '''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 95 features (F16)
+Top 4 results show that k=1 yields the highest accuracy 53min 59s runtime intel core i5 4690 @3.5GHz
+1, 0.9994427576919176
+'''
+
+'''
+Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 14 features (F14)
+Top 4 results show that k=1 yields the highest accuracy 49min 1s runtime intel core i5 4690 @3.5GHz
+1, 0.9986304780573146
+'''
+
