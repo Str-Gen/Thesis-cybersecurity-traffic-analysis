@@ -16,6 +16,7 @@ import pandas as pd
 import random
 import itertools
 import operator
+import argparse
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # SPARK_PRINT_LAUNCH_COMMAND=true spark-submit --py-files /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --jars /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --driver-memory 12g --num-executors 4 light_spark_NSL_KDD.py
@@ -26,15 +27,22 @@ sc.setLogLevel('ERROR')
 
 sqlContext = SQLContext(sc)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-F","--features",action="store",dest="F",help="Number of features to use",type=int,choices=[14,16,41],required=True)
+parser.add_argument("-A","--algorithm",action="store",dest="A",help="Which algorithm to use",type=str,choices=["kNN","NB","linSVC","RF","binLR"],required=True)
+results = parser.parse_args()
+
+# 41, 16 or 14 Features 
+# 16 after one hot encoding leads to 95 features
+# 41 after one hot encoding leads to 122 features
+F = results.F
+A = results.A
+
 # Raw data
 train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
-# 41, 16 or 14 Features (16 will be one hot encoded leading to 95 features)
-F41 = False
-F16 = False
-F14 = True
 
 # All columns
 col_names = np.array(["duration", "protocol_type", "service", "flag", "src_bytes",
@@ -64,7 +72,7 @@ numeric_cols = col_names[numeric_indexes].tolist()
 pandas_df = pd.read_csv(train_nsl_kdd_dataset_path,names=col_names)
 pandas_df = pandas_df.drop('labels_numeric',axis=1)
 
-if F14:
+if F == 14:
     relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
     'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
@@ -73,7 +81,7 @@ if F14:
     numeric_cols = relevant14[numeric_indexes].tolist() 
     pandas_df = pandas_df[relevant14]
 
-if F16:
+if F == 16:
     relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
     'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
@@ -90,7 +98,7 @@ if F16:
         pandas_df = pandas_df.drop(cat,axis=1)
         pandas_df = pandas_df.join(one_hot)
 
-if F41:
+if F == 41:
     # one hot encoding for categorical features
     for cat in nominal_cols:
         one_hot = pd.get_dummies(pandas_df[cat])    
@@ -194,19 +202,21 @@ for cross in range(0,3):
         crossed[k] = []
         gt0 = time()
         print('Initializing')
-        knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
-        # print('Params:', [p.name for p in knn.params])
-        print('Fitting:')
-        model = knn.fit(scaled_train_df)
-        # print('bufferSize:', model._java_obj.getBufferSize())
-        # scaled_cv_df.show(truncate=False)
-        # Don't drop label, need for verification!
-        # scaled_cv_df = scaled_cv_df.drop('label')
-        print('Predicting:')
-        predictions = model.transform(scaled_cv_df)
-        print('Predictions done:')
-        # for row in predictions.collect():
-        #     print(row)
+
+        if A == 'kNN':
+            knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
+            # print('Params:', [p.name for p in knn.params])
+            print('Fitting:')
+            model = knn.fit(scaled_train_df)
+            # print('bufferSize:', model._java_obj.getBufferSize())
+            # scaled_cv_df.show(truncate=False)
+            # Don't drop label, need for verification!
+            # scaled_cv_df = scaled_cv_df.drop('label')
+            print('Predicting:')
+            predictions = model.transform(scaled_cv_df)
+            print('Predictions done:')
+            # for row in predictions.collect():
+            #     print(row)
 
         evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
         metric = evaluator.evaluate(predictions)

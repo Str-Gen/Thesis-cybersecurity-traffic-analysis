@@ -9,11 +9,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from time import time
+import argparse
 from collections import OrderedDict
 from sklearn import model_selection
 from sklearn.neighbors import KNeighborsClassifier
 
 # %matplotlib inline
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-F","--features",action="store",dest="F",help="Number of features to use",type=int,choices=[14,16,41],required=True)
+parser.add_argument("-A","--algorithm",action="store",dest="A",help="Which algorithm to use",type=str,choices=["kNN","NB","linSVC","RF","binLR"],required=True)
+results = parser.parse_args()
+
+# 41, 16 or 14 Features 
+# 16 after one hot encoding leads to 95 features
+# 41 after one hot encoding leads to 122 features
+F = results.F
+
+A = results.A
+
 gt0 = time()
 
 # Raw data
@@ -21,12 +35,6 @@ train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
-# 41, 16 or 14 Features 
-# 16 after one hot encoding leads to 95 features
-# 41 after one hot encoding leads to 122 features
-F41 = False
-F16 = True
-F14 = False
 
 # All columns
 col_names = np.array(["duration","protocol_type","service","flag","src_bytes",
@@ -56,7 +64,7 @@ numeric_cols = col_names[numeric_indexes].tolist()
 dataframe = pd.read_csv(train_nsl_kdd_dataset_path,names=col_names)
 dataframe = dataframe.drop('labels_numeric',axis=1)
 
-if F14:
+if F == 14:
     relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
     'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
@@ -65,7 +73,7 @@ if F14:
     numeric_cols = relevant14[numeric_indexes].tolist()    
     dataframe = dataframe[relevant14]
 
-if F16:
+if F == 16:
     relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
     'dst_host_same_srv_rate','dst_host_diff_srv_rate','dst_host_serror_rate','dst_host_srv_serror_rate','dst_host_rerror_rate'])
@@ -81,7 +89,7 @@ if F16:
         one_hot = pd.get_dummies(dataframe[cat])    
         dataframe = dataframe.drop(cat,axis=1)
         dataframe = dataframe.join(one_hot)
-if F41:
+if F == 41:
     # one hot encoding for categorical features
     for cat in nominal_cols:
         one_hot = pd.get_dummies(dataframe[cat])    
@@ -174,7 +182,9 @@ for cross in range(0,3):
         sys.stdout.write('Round %d, k = %d \r' % (cross,k))        
         sys.stdout.flush()
         gt0 = time()
-        neigh = KNeighborsClassifier(n_neighbors=k, p=1, n_jobs=-1)
+        neigh = None
+        if A == 'kNN':
+            neigh = KNeighborsClassifier(n_neighbors=k, p=1, n_jobs=-1)
         neigh.fit(X_train,Y_train)
         result = neigh.score(X_test,Y_test)
         crossed[k].append([result,time()-gt0])

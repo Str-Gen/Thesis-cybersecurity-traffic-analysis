@@ -16,6 +16,7 @@ import pandas as pd
 import random
 import itertools
 import operator
+import argparse
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # spark-submit --py-files python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar --jars spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar YOUR-SCRIPT.py
@@ -33,16 +34,23 @@ spark = SparkSession.builder \
         # .getOrCreate()
 spark.sparkContext.setLogLevel("ERROR")
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-F","--features",action="store",dest="F",help="Number of features to use",type=int,choices=[14,16,41],required=True)
+parser.add_argument("-A","--algorithm",action="store",dest="A",help="Which algorithm to use",type=str,choices=["kNN","NB","linSVC","RF","binLR"],required=True)
+results = parser.parse_args()
+
+# 41, 16 or 14 Features 
+# 16 after one hot encoding leads to 95 features
+# 41 after one hot encoding leads to 122 features
+F = results.F
+
+A = results.A
 
 # Raw data
 train20_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+_20Percent.csv"
 train_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTrain+.csv"
 test_nsl_kdd_dataset_path = "NSL_KDD_Dataset/KDDTest+.csv"
 
-# 41, 16 or 14 Features (16 will be one hot encoded leading to 95 features)
-F41 = False
-F16 = False
-F14 = True
 
 # All columns
 col_names = np.array(["duration", "protocol_type", "service", "flag", "src_bytes",
@@ -153,7 +161,7 @@ test_df = test_df.cache()
 test_df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
 
-if F14:
+if F == 14:
     t0 = time()
     relevant14 = np.array(['dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
@@ -164,7 +172,7 @@ if F14:
     nominal_cols = []
     print(time()-t0)
 
-if F16:
+if F == 16:
     t0 = time()
     relevant16 = np.array(['service','flag','dst_bytes','wrong_fragment','count','serror_rate',
     'srv_serror_rate','srv_rerror_rate','same_srv_rate','dst_host_count','dst_host_srv_count',
@@ -186,7 +194,7 @@ if F16:
     print(time()-t0)
 
 
-if F41:
+if F == 41:
     t0 = time()
     idxs = [StringIndexer(inputCol=c,outputCol=c+'_index') for c in nominal_cols]
     ohes = [OneHotEncoderEstimator(inputCols=[c+'_index'],outputCols=[c+'_numeric'],dropLast=False) for c in nominal_cols]
@@ -234,20 +242,22 @@ print(time()-t0)
 print(train_df.dtypes)
 
 t0 = time()
-knn = KNNClassifier(k=1,featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
-#grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
-grid = ParamGridBuilder().build()
-evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
-# BinaryClassificationEvaluator default is areaUnderROC
-evaluator.setMetricName('areaUnderROC')
-#cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
-tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
-print(train_df.count())
-#cvModel = cv.fit(train_df)
-ttsModel = tts.fit(train_df)
-#result = evaluator.evaluate(cvModel.transform(train_df))
-result = evaluator.evaluate(ttsModel.transform(train_df))
-print('result:',result,'in',time()-t0)
+
+if A == 'kNN':
+    knn = KNNClassifier(k=1,featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
+    #grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
+    grid = ParamGridBuilder().build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    # BinaryClassificationEvaluator default is areaUnderROC
+    evaluator.setMetricName('areaUnderROC')
+    #cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    print(train_df.count())
+    #cvModel = cv.fit(train_df)
+    ttsModel = tts.fit(train_df)
+    #result = evaluator.evaluate(cvModel.transform(train_df))
+    result = evaluator.evaluate(ttsModel.transform(train_df))
+    print('result:',result,'in',time()-t0)
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
