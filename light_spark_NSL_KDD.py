@@ -29,7 +29,7 @@ sqlContext = SQLContext(sc)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-F","--features",action="store",dest="F",help="Number of features to use",type=int,choices=[14,16,41],required=True)
-parser.add_argument("-A","--algorithm",action="store",dest="A",help="Which algorithm to use",type=str,choices=["kNN","NB","linSVC","RF","binLR"],required=True)
+parser.add_argument("-A","--algorithm",action="store",dest="A",help="Which algorithm to use",type=str,choices=["kNN","DTree","linSVC","RForest","binLR"],required=True)
 results = parser.parse_args()
 
 # 41, 16 or 14 Features 
