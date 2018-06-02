@@ -221,6 +221,7 @@ def linSVC_with_tol_iter_fixed(data,tolerance,iterations):
     result = classifier.score(X_test,Y_test)
     crossed['linSVC'] = []
     crossed['linSVC'].append([result,time()-gt0])
+    return crossed
     
 def binLR_with_tol_iter_search(data,cross=0,tol_start=0,tol_end=-9,iter_start=0,iter_end=7):
     for tol_exp in range(tol_start,tol_end-1,-1):
@@ -242,6 +243,7 @@ def binLR_with_tol_iter_fixed(data,tolerance,iterations):
     result = classifier.score(X_test,Y_test)
     crossed['binLR'] = []
     crossed['binLR'].append([result,time()-gt0])
+    return crossed
 
 def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
     possible_features = range(1,max_features,1)
@@ -265,6 +267,7 @@ def DTree_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
     result = classifier.score(X_test,Y_test)
     crossed['DTree:depth'+repr(max_depth)+':features'+repr(max_features)] = []
     crossed['DTree:depth'+repr(max_depth)+':features'+repr(max_features)].append([result,time()-gt0])
+    return crossed
 
 def RForest_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):
     possible_features = range(1,max_features,1)
@@ -288,6 +291,7 @@ def RForest_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
     result = classifier.score(X_test,Y_test)
     crossed['RForest:depth'+repr(max_depth)+':features'+repr(max_features)] = []
     crossed['RForest:depth'+repr(max_depth)+':features'+repr(max_features)].append([result,time()-gt0])
+    return crossed
 
 crossed = {}
 for cross in range(0, 3):
@@ -350,7 +354,6 @@ Top 4 results show that k=1 yields the highest accuracy 47min 43s runtime intel 
 (9, [0.9554507841816607, 0.0, 40.0942759513855, 0.0])
 (13, [0.9554748388338304, 0.0, 40.25523495674133, 0.0])
 '''
-
 
 # Fine-grained dictionary, packets are normal or attacks, and the attacks are divided into 4 subcategories
 

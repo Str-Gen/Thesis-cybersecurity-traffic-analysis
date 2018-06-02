@@ -17,6 +17,7 @@ import random
 import itertools
 import operator
 import argparse
+import sys
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # SPARK_PRINT_LAUNCH_COMMAND=true spark-submit --py-files /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --jars /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --driver-memory 12g --num-executors 4 light_spark_NSL_KDD.py
@@ -189,6 +190,34 @@ spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized
 # spark_df_vectorized.show(truncate=False)
 
 
+def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2, distance_power=2):
+    gt0 = time()
+    for k in range(k_start, k_end, k_step):
+        crossed[k] = []
+    for k in range(k_start, k_end, k_step):
+        sys.stdout.write('Round %d, k = %d \r' % (cross, k))
+        sys.stdout.flush()
+        classifier = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
+        model = classifier.fit(data['scaled_train_df'])
+        predictions = model.transform(data['scaled_cv_df'])
+        evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+        metric = evaluator.evaluate(predictions)
+        crossed[k].append([metric, time()-gt0])
+    return crossed
+
+
+def kNN_with_k_fixed(data, k, distance_power):
+    gt0 = time()
+    crossed[k] = []
+    classifier = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
+    model = classifier.fit(data['scaled_train_df'])
+    predictions = model.transform(data['scaled_cv_df'])
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    metric = evaluator.evaluate(predictions)
+    crossed[k].append([metric, time()-gt0])
+    return crossed
+
+
 crossed = {}
 for cross in range(0,3):
     seed = int(round(random.random()*1000000))
@@ -197,41 +226,25 @@ for cross in range(0,3):
     scaled_train_df = split[0].cache()
     # scaled_train_df.show(truncate=False)
     scaled_cv_df = split[1].cache()     
+
+    data = {
+        'scaled_train_df' : scaled_train_df,
+        'scaled_cv_df' : scaled_cv_df
+    }
     
-    for k in range(1,101,4):
-        crossed[k] = []
-        gt0 = time()
-        print('Initializing')
+    if A == 'kNN':
+        kNN_with_k_search(data,cross=cross,k_start=1,k_end=3,k_step=2,)
+            
 
-        if A == 'kNN':
-            knn = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
-            # print('Params:', [p.name for p in knn.params])
-            print('Fitting:')
-            model = knn.fit(scaled_train_df)
-            # print('bufferSize:', model._java_obj.getBufferSize())
-            # scaled_cv_df.show(truncate=False)
-            # Don't drop label, need for verification!
-            # scaled_cv_df = scaled_cv_df.drop('label')
-            print('Predicting:')
-            predictions = model.transform(scaled_cv_df)
-            print('Predictions done:')
-            # for row in predictions.collect():
-            #     print(row)
-
-        evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
-        metric = evaluator.evaluate(predictions)
-
-        print(metric)
-        crossed[k].append([metric,time()-gt0])
-
+        
 for k in crossed:
     accs = [item[0] for item in crossed[k]]
     times = [item[1] for item in crossed[k]]
-
     crossed[k] = [np.mean(accs), np.std(accs), np.mean(times),np.std(times)]
 
-validated = sorted(crossed.items(),key=operator.itemgetter(0))
-for topn in range(4):
+validated = sorted(crossed.items(), key=lambda s:s[1] ,reverse=True)
+for topn in range(0,len(crossed)) if len(crossed)<5 else range(0,5):
+    # print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
     print(validated[topn])
 
 '''
