@@ -9,6 +9,7 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
 from pyspark_knn.ml.classification import KNNClassifier
+from pyspark.ml.classification import LinearSVC, LogisticRegression, DecisionTreeClassifier, RandomForestClassifier
 
 from time import time
 import numpy as np
@@ -193,7 +194,7 @@ spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized
 def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2, distance_power=2):
     gt0 = time()
     for k in range(k_start, k_end, k_step):
-        crossed[k] = []
+        crossed['knn:k'+repr(k)] = []
     for k in range(k_start, k_end, k_step):
         sys.stdout.write('Round %d, k = %d \r' % (cross, k))
         sys.stdout.flush()
@@ -202,22 +203,127 @@ def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2, distance_po
         predictions = model.transform(data['scaled_cv_df'])
         evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
         metric = evaluator.evaluate(predictions)
-        crossed[k].append([metric, time()-gt0])
+        crossed['knn:k'+repr(k)].append([metric, time()-gt0])
     return crossed
 
 
 def kNN_with_k_fixed(data, k, distance_power):
     gt0 = time()
-    crossed[k] = []
+    crossed['knn:k'+repr(k)] = []
     classifier = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 
     model = classifier.fit(data['scaled_train_df'])
     predictions = model.transform(data['scaled_cv_df'])
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     metric = evaluator.evaluate(predictions)
-    crossed[k].append([metric, time()-gt0])
+    crossed['knn:k'+repr(k)].append([metric, time()-gt0])
     return crossed
 
+def linSVC_with_tol_iter_search(data, cross=0, tol_start=0, tol_end=-9, iter_start=0, iter_end=7):    
+    for tol_exp in range(tol_start,tol_end-1,-1):
+        for iter_exp in range(iter_start, iter_end+1):
+            sys.stdout.write('Round %d Testing tol = %f with iterations= %f \r' % (cross,10**tol_exp, 10**iter_exp))
+            sys.stdout.flush()
+            gt0 = time()
+            crossed['linSVC:tol1e'+repr(tol_exp)+':iter1e'+repr(iter_exp)] = []
+            classifier = LinearSVC(maxIter=10**iter_exp, tol=10**tol_exp)
+            model = classifier.fit(data['scaled_train_df'])
+            predictions = model.transform(data['scaled_cv_df'])
+            evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+            metric = evaluator.evaluate(predictions)
+            crossed['linSVC:tol1e'+repr(tol_exp)+':iter1e'+repr(iter_exp)].append([metric,time()-gt0])
+    return crossed
 
+def linSVC_with_tol_iter_fixed(data,tolerance,iterations):
+    gt0 = time()
+    crossed['linSVC:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)] = []
+    classifier = LinearSVC(maxIter=iterations, tol=tolerance)
+    model = classifier.fit(data['scaled_train_df'])
+    predictions = model.transform(data['scaled_cv_df'])
+    evaluator =  BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    metric = evaluator.evaluate(predictions)
+    crossed['linSVC:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
+
+def binLR_with_tol_iter_search(data,cross=0, tol_start=0, tol_end=-9, iter_start=0, iter_end=7):    
+    for tol_exp in range(tol_start,tol_end-1,-1):
+        for iter_exp in range(iter_start, iter_end+1):
+            sys.stdout.write('Round %d Testing tol = %f with iterations= %f \r' % (cross,10**tol_exp, 10**iter_exp))
+            sys.stdout.flush()
+            gt0 = time()
+            crossed['binLR:tol1e'+repr(tol_exp)+':iter1e'+repr(iter_exp)] = []
+            classifier = LogisticRegression(maxIter=10**iter_exp, tol=10**tol_exp)
+            model = classifier.fit(data['scaled_train_df'])
+            predictions = model.transform(data['scaled_cv_df'])
+            evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+            metric = evaluator.evaluate(predictions)
+            crossed['binLR:tol1e'+repr(tol_exp)+':iter1e'+repr(iter_exp)].append([metric,time()-gt0])
+    return crossed
+
+def binLR_with_tol_iter_fixed():
+    gt0 = time()
+    crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)] = []
+    classifier = LogisticRegression(maxIter=iterations, tol=tolerance)
+    model = classifier.fit(data['scaled_train_df'])
+    predictions = model.transform(data['scaled_cv_df'])
+    evaluator =  BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    metric = evaluator.evaluate(predictions)
+    crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
+
+def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
+    possible_features = range(1,max_features,1)
+    possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
+    for md in range(1,max_depth,4):
+        for mf in possible_features:
+            sys.stdout.write('Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))
+            sys.stdout.flush()
+            gt0 = time()
+            crossed['DTree:maxFeatures'+repr(mf)+':maxDepth'+repr(md)] = []
+            classifier = DecisionTreeClassifier(maxDepth=md,maxBins=mf,impurity='gini',maxMemoryInMB=1024)
+            model = classifier.fit(data['scaled_train_df'])
+            predictions = model.transform(data['scaled_cv_df'])
+            evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+            metric = evaluator.evaluate(predictions)
+            crossed['DTree:maxFeatures'+repr(mf)+':maxDepth'+repr(md)].append([metric,time()-gt0])
+    return crossed
+
+def DTree_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
+    gt0 = time()    
+    crossed['DTree:depth'+repr(max_depth)+':features'+repr(max_features)] = []
+    classifier = DecisionTreeClassifier(maxDepth=md,maxBins=mf,impurity='gini',maxMemoryInMB=1024)
+    model = classifier.fit(data['scaled_train_df'])
+    predictions = model.transform(data['scaled_cv_df'])
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    metric = evaluator.evaluate(predictions)
+    crossed['DTree:depth'+repr(max_depth)+':features'+repr(max_features)].append([metric,time()-gt0])
+    return crossed
+
+def RForest_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
+    possible_features = range(1,max_features,1)
+    possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
+    for md in range(1,max_depth,4):
+        for mf in possible_features:
+            sys.stdout.write('Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))
+            sys.stdout.flush()
+            gt0 = time()
+            crossed['RForest:maxFeatures'+repr(mf)+':maxDepth'+repr(md)] = []
+            classifier = RandomForestClassifier(maxDepth=md,maxBins=mf,impurity='gini',maxMemoryInMB=1024)
+            model = classifier.fit(data['scaled_train_df'])
+            predictions = model.transform(data['scaled_cv_df'])
+            evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+            metric = evaluator.evaluate(predictions)
+            crossed['RForest:maxFeatures'+repr(mf)+':maxDepth'+repr(md)].append([metric,time()-gt0])
+    return crossed
+
+def RForest_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
+    gt0 = time()    
+    crossed['RForest:depth'+repr(max_depth)+':features'+repr(max_features)] = []
+    classifier = RandomForestClassifier(maxDepth=md,maxBins=mf,impurity='gini',maxMemoryInMB=1024)
+    model = classifier.fit(data['scaled_train_df'])
+    predictions = model.transform(data['scaled_cv_df'])
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    metric = evaluator.evaluate(predictions)
+    crossed['RForest:depth'+repr(max_depth)+':features'+repr(max_features)].append([metric,time()-gt0])
+    return crossed
+            
 crossed = {}
 for cross in range(0,3):
     seed = int(round(random.random()*1000000))
@@ -234,8 +340,14 @@ for cross in range(0,3):
     
     if A == 'kNN':
         kNN_with_k_search(data,cross=cross,k_start=1,k_end=3,k_step=2,)
-            
-
+    elif A == 'linSVC':
+        crossed = linSVC_with_tol_iter_search(data,cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    elif A == 'binLR':
+        crossed = binLR_with_tol_iter_search(data,cross=cross,tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    elif A == 'DTree':
+        crossed = DTree_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=751,max_features=F)
+    elif A == 'RForest':
+        crossed = RForest_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=751,max_features=F)    
         
 for k in crossed:
     accs = [item[0] for item in crossed[k]]
