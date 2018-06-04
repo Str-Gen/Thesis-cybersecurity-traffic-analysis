@@ -191,7 +191,7 @@ spark_df_vectorized = spark_df_vectorized.withColumn('label',spark_df_vectorized
 # spark_df_vectorized.show(truncate=False)
 
 
-def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2, distance_power=2):
+def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2):
     gt0 = time()
     for k in range(k_start, k_end, k_step):
         crossed['knn:k'+repr(k)] = []
@@ -207,7 +207,7 @@ def kNN_with_k_search(data, cross=0, k_start=1, k_end=101, k_step=2, distance_po
     return crossed
 
 
-def kNN_with_k_fixed(data, k, distance_power):
+def kNN_with_k_fixed(data, k):
     gt0 = time()
     crossed['knn:k'+repr(k)] = []
     classifier = KNNClassifier(k=k, featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30 )  # bufferSize=-1.0,   bufferSizeSampleSize=[1, 2, 3] 

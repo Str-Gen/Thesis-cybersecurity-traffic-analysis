@@ -1,7 +1,7 @@
 #! /usr/bin/python
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, col, min
+from pyspark.sql.functions import udf, col, min, max, lit, lower
 import pyspark.sql.functions as sql
 from pyspark.sql.types import *
 from pyspark.ml.linalg import Vectors, VectorUDT, DenseVector
@@ -202,21 +202,23 @@ if F == 41:
     OhePipeline = Pipeline(stages=idxs)
     train_df = OhePipeline.fit(train_df).transform(train_df)
     train_df = train_df.drop(*nominal_cols)
+    train_df = train_df.drop(c+'_index' for c in nominal_cols)
     train_df = train_df.cache()
     train_df.show(n=5,truncate=False,vertical=True)
     print(time()-t0)
 
 t0 = time()
-vect_numeric = [VectorAssembler(inputCols=[c],outputCol=c+'_vec') for c in numeric_cols ]
-scls_nominal = [MinMaxScaler(inputCol=c,outputCol=c+'_scaled') for c in [x+'_numeric' for x in nominal_cols] ]
-scls_numeric = [MinMaxScaler(inputCol=c+'_vec',outputCol=c+'_scaled') for c in numeric_cols ]
-vect_numeric.extend(scls_numeric)
-vect_numeric.extend(scls_nominal)
-SclPipeline = Pipeline(stages=vect_numeric)
-train_df = SclPipeline.fit(train_df).transform(train_df)
-train_df = train_df.drop(*numeric_cols)
-for x in nominal_cols:
-    train_df = train_df.drop(x+'_numeric',x+'_index')
+
+
+min_max_column_udf = udf(lambda x, mi, ma: (x-mi)/(ma-mi), DoubleType())
+
+for column in numeric_cols:    
+    minimum = train_df.agg({column:'min'}).collect()[0][0]
+    maximum = train_df.agg({column:'max'}).collect()[0][0]
+    train_df = train_df.withColumn(column,min_max_column_udf(train_df[column],lit(minimum),lit(maximum)))
+
+train_df.show(n=5,truncate=False,vertical=True)    
+
 train_df = train_df.cache()
 train_df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
@@ -236,29 +238,49 @@ def makeDense(v):
 makeDenseUDF = udf(makeDense,VectorUDT())
 
 train_df = train_df.withColumn('features',makeDenseUDF(train_df.features))
-train_df_vectorized = train_df.select('features','label')
-train_df.show(n=5,truncate=False,vertical=True)
+df = train_df.select('features','label')
+df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
-print(train_df.dtypes)
+print(df.dtypes)
 
 t0 = time()
 
-if A == 'kNN':
-    knn = KNNClassifier(k=1,featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
-    #grid = ParamGridBuilder().addGrid(knn.k,range(1,101,4)).build()
-    grid = ParamGridBuilder().build()
+def kNN_with_k_search(df, k_start=1, k_end=101, k_step=4):
+    knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
+    grid = ParamGridBuilder().addGrid(knn.k,range(k_start,k_end,k_step)).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
-    # BinaryClassificationEvaluator default is areaUnderROC
-    evaluator.setMetricName('areaUnderROC')
-    #cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
-    tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
-    print(train_df.count())
-    #cvModel = cv.fit(train_df)
-    ttsModel = tts.fit(train_df)
-    #result = evaluator.evaluate(cvModel.transform(train_df))
-    result = evaluator.evaluate(ttsModel.transform(train_df))
-    print('result:',result,'in',time()-t0)
+    # BinaryClassificationEvaluator default is areaUnderROC, other option is areaUnderPR
+    # evaluator.setMetricName('areaUnderROC')
+    cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    cvModel = cv.fit(df)
+    print(cvModel.getEstimator())
+    print(cvModel.getEstimatorParamMaps())
+    print(cvModel.avgMetrics)
 
+    crossed = {}
+    for k in range(k_start,k_end,k_step):
+        crossed['kNN:k'+repr(k)] = cvModel.avgMetrics.pop(0)
+    
+    print(crossed)
+
+    
+    result = evaluator.evaluate(cvModel.transform(df))
+    print(result)
+
+def kNN_with_k_fixed(data,k):
+    knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
+    grid = ParamGridBuilder(knn.k,k).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    ttsModel = tts.fit(train_df)
+    result = evaluator.evaluate(ttsModel.transform(train_df))
+
+if A == 'kNN':
+    kNN_with_k_search(df,k_start=1,k_end=101,k_step=4)
+    
+    
+    
+    
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
 Top result shows that k=1 yields the highest accuracy 1h 8min 4s runtime intel core i5 4690 @3.5GHz
