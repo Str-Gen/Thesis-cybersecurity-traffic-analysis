@@ -271,7 +271,7 @@ def binLR_with_tol_iter_fixed():
     metric = evaluator.evaluate(predictions)
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
 
-def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
+def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=2):    
     possible_features = list(range(2,max_features,1))
     possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
     for md in range(1,max_depth+1,1):
@@ -299,7 +299,7 @@ def DTree_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
     crossed['DTree:depth'+repr(max_depth)+':features'+repr(max_features)].append([metric,time()-gt0])
     return crossed
 
-def RForest_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
+def RForest_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=2):    
     possible_features = list(range(2,max_features,1))
     possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
     for md in range(1,max_depth+1,1):
@@ -342,7 +342,7 @@ for cross in range(0,3):
     }
     
     if A == 'kNN':
-        kNN_with_k_search(data,cross=cross,k_start=1,k_end=3,k_step=2,)
+        kNN_with_k_search(data,cross=cross,k_start=1,k_end=51,k_step=2,)
     elif A == 'linSVC':
         crossed = linSVC_with_tol_iter_search(data,cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
     elif A == 'binLR':
@@ -363,6 +363,7 @@ for topn in range(0,len(crossed)) if len(crossed)<5 else range(0,5):
     print(validated[topn])
 
 print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
+print('Features',F,'Algorithm',A)    
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)

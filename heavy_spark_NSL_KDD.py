@@ -153,8 +153,8 @@ train_df = mapping2DPipeline.fit(train_df).transform(train_df)
 train_df = train_df.drop('labels','labels_numeric','2DAttackLabel')
 train_df = train_df.withColumnRenamed('index_2DAttackLabel','label')
 # train_df = train_df.cache()
-train_df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
+# train_df.show(n=5,truncate=False,vertical=True)
+#print(time()-t0)
 
 t0 = time()
 test_df = read_dataset_typed(test_nsl_kdd_dataset_path)
@@ -162,8 +162,8 @@ test_df = mapping2DPipeline.fit(test_df).transform(test_df)
 test_df = test_df.drop('labels','labels_numeric','2DAttackLabel')
 test_df = test_df.withColumnRenamed('index_2DAttackLabel','label')
 test_df = test_df.cache()
-test_df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
+# test_df.show(n=5,truncate=False,vertical=True)
+#print(time()-t0)
 
 if F == 14:
     t0 = time()
@@ -174,7 +174,7 @@ if F == 14:
     train_df = train_df.select(*relevant14,'label')
     numeric_cols = relevant14.tolist()
     nominal_cols = []
-    print(time()-t0)
+    #print(time()-t0)
 
 if F == 16:
     t0 = time()
@@ -192,12 +192,11 @@ if F == 16:
     idxs.extend(ohes)
     OhePipeline = Pipeline(stages=idxs)
     train_df = OhePipeline.fit(train_df).transform(train_df)
-    train_df = train_df.drop(*nominal_cols)
-    train_df.show(n=5,truncate=False,vertical=True)
+    train_df = train_df.drop(*nominal_cols)    
     train_df = train_df.drop(*[c+'_index' for c in nominal_cols])
     # train_df = train_df.cache()
-    train_df.show(n=5,truncate=False,vertical=True)
-    print(time()-t0)
+    # train_df.show(n=5,truncate=False,vertical=True)
+    # print(time()-t0)
 
 
 if F == 41:
@@ -211,10 +210,7 @@ if F == 41:
     train_df = train_df.drop(*[c+'_index' for c in nominal_cols])
     #train_df = train_df.cache()
     train_df.show(n=5,truncate=False,vertical=True)
-    print(time()-t0)
-
-t0 = time()
-
+    #print(time()-t0)
 
 min_max_column_udf = udf(lambda x, mi, ma: (x-mi)/(ma-mi), DoubleType())
 
@@ -235,8 +231,8 @@ assembler = VectorAssembler( inputCols=all_features, outputCol='features')
 train_df = assembler.transform(train_df)
 drop_columns = [ drop for drop in train_df.columns if drop != 'label' and drop != 'features' ]
 train_df = train_df.drop(*drop_columns)
-train_df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
+# train_df.show(n=5,truncate=False,vertical=True)
+# print(time()-t0)
 
 t0 = time()
 def makeDense(v):
@@ -245,10 +241,7 @@ makeDenseUDF = udf(makeDense,VectorUDT())
 
 train_df = train_df.withColumn('features',makeDenseUDF(train_df.features))
 df = train_df.select('features','label')
-df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
-print(df.dtypes)
-
+# df.show(n=5,truncate=False,vertical=True)
 df = df.cache()
 
 t0 = time()
@@ -260,19 +253,9 @@ def kNN_with_k_search(df, k_start=1, k_end=101, k_step=4):
     # BinaryClassificationEvaluator default is areaUnderROC, other option is areaUnderPR
     # evaluator.setMetricName('areaUnderROC')
     cv = CrossValidator(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
-    cvModel = cv.fit(df)
-    print(cvModel.getEstimator())
-    print(cvModel.getEstimatorParamMaps())
-    print(cvModel.avgMetrics)
-
-    crossed = {}
-    for k in range(k_start,k_end,k_step):
-        crossed['kNN:k'+repr(k)] = cvModel.avgMetrics.pop(0)
-    
-    print(crossed)    
+    cvModel = cv.fit(df)          
     result = evaluator.evaluate(cvModel.transform(df))
-
-    print(cvModel.bestModel, result)
+    print('kNN:k',cvModel.bestModel._java_obj.getK(),result)
 
 def kNN_with_k_fixed(df,k):
     knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
@@ -340,7 +323,7 @@ def binLR_with_tol_iter_fixed(df,tolerance,iterations):
     result = evaluator.evaluate(ttsModel.transform(df))
     print('binLR:tol',tolerance,':maxIter',iterations,'result',result)
 
-def DTree_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=251):
+def DTree_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
     DTree = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)
     features = list(range(2,max_features,1))
     features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
@@ -361,7 +344,7 @@ def DTree_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     result = evaluator.evaluate(ttsModel.transform(df))
     print('DTree:maxDepth',max_depth,':maxBins',max_features,':result',result)
 
-def RForest_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=251):
+def RForest_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
     RForest = RandomForestClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)
     features = list(range(2,max_features,1))
     features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
@@ -383,9 +366,9 @@ def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     print('RForest:maxDepth',max_depth,':maxBins',max_features,':result',result)
 
 if A == 'kNN':
-    kNN_with_k_search(df,k_start=1,k_end=101,k_step=4)
+    kNN_with_k_search(df,k_start=1,k_end=51,k_step=2)
 elif A == 'linSVC':
-    crossed = linSVC_with_tol_iter_search(df, tol_start=-4, tol_end=-4, iter_start=3, iter_end=3)
+    crossed = linSVC_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
 elif A == 'binLR':
     crossed = binLR_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
 elif A == 'DTree':
@@ -394,7 +377,7 @@ elif A == 'RForest':
     crossed = RForest_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
     
 print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
-    
+print('Features',F,'Algorithm',A)    
     
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
