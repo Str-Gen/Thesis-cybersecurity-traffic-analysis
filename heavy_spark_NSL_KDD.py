@@ -10,6 +10,7 @@ from pyspark.ml.feature import VectorAssembler, StringIndexer, OneHotEncoderEsti
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder, TrainValidationSplit
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark_knn.ml.classification import KNNClassifier
+from pyspark.ml.classification import LinearSVC, LogisticRegression, DecisionTreeClassifier, RandomForestClassifier 
 from time import time
 import numpy as np
 import pandas as pd
@@ -17,6 +18,9 @@ import random
 import itertools
 import operator
 import argparse
+import math
+
+totaltime = time()
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # spark-submit --py-files python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar --jars spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-*.jar YOUR-SCRIPT.py
@@ -148,7 +152,7 @@ train_df = read_dataset_typed(train_nsl_kdd_dataset_path)
 train_df = mapping2DPipeline.fit(train_df).transform(train_df)
 train_df = train_df.drop('labels','labels_numeric','2DAttackLabel')
 train_df = train_df.withColumnRenamed('index_2DAttackLabel','label')
-train_df = train_df.cache()
+# train_df = train_df.cache()
 train_df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
 
@@ -189,7 +193,9 @@ if F == 16:
     OhePipeline = Pipeline(stages=idxs)
     train_df = OhePipeline.fit(train_df).transform(train_df)
     train_df = train_df.drop(*nominal_cols)
-    train_df = train_df.cache()
+    train_df.show(n=5,truncate=False,vertical=True)
+    train_df = train_df.drop(*[c+'_index' for c in nominal_cols])
+    # train_df = train_df.cache()
     train_df.show(n=5,truncate=False,vertical=True)
     print(time()-t0)
 
@@ -202,8 +208,8 @@ if F == 41:
     OhePipeline = Pipeline(stages=idxs)
     train_df = OhePipeline.fit(train_df).transform(train_df)
     train_df = train_df.drop(*nominal_cols)
-    train_df = train_df.drop(c+'_index' for c in nominal_cols)
-    train_df = train_df.cache()
+    train_df = train_df.drop(*[c+'_index' for c in nominal_cols])
+    #train_df = train_df.cache()
     train_df.show(n=5,truncate=False,vertical=True)
     print(time()-t0)
 
@@ -217,11 +223,11 @@ for column in numeric_cols:
     maximum = train_df.agg({column:'max'}).collect()[0][0]
     train_df = train_df.withColumn(column,min_max_column_udf(train_df[column],lit(minimum),lit(maximum)))
 
-train_df.show(n=5,truncate=False,vertical=True)    
+#train_df.show(n=5,truncate=False,vertical=True)    
 
-train_df = train_df.cache()
-train_df.show(n=5,truncate=False,vertical=True)
-print(time()-t0)
+#train_df = train_df.cache()
+#train_df.show(n=5,truncate=False,vertical=True)
+#print(time()-t0)
 
 t0 = time()
 all_features = [ feature for feature in train_df.columns if feature != 'label' ]
@@ -243,6 +249,8 @@ df.show(n=5,truncate=False,vertical=True)
 print(time()-t0)
 print(df.dtypes)
 
+df = df.cache()
+
 t0 = time()
 
 def kNN_with_k_search(df, k_start=1, k_end=101, k_step=4):
@@ -261,24 +269,131 @@ def kNN_with_k_search(df, k_start=1, k_end=101, k_step=4):
     for k in range(k_start,k_end,k_step):
         crossed['kNN:k'+repr(k)] = cvModel.avgMetrics.pop(0)
     
-    print(crossed)
-
-    
+    print(crossed)    
     result = evaluator.evaluate(cvModel.transform(df))
-    print(result)
 
-def kNN_with_k_fixed(data,k):
+    print(cvModel.bestModel, result)
+
+def kNN_with_k_fixed(df,k):
     knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
     grid = ParamGridBuilder(knn.k,k).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
-    ttsModel = tts.fit(train_df)
-    result = evaluator.evaluate(ttsModel.transform(train_df))
+    ttsModel = tts.fit(df)
+    result = evaluator.evaluate(ttsModel.transform(df))
+
+def linSVC_with_tol_iter_search(df,tol_start=0, tol_end=-9, iter_start=0, iter_end=7):
+    linSVC = LinearSVC(featuresCol='features',labelCol='label')
+    # funniest thing, LinearSVC expects a double for its tol parameter and an integer for iterations
+    # somehow this wasn't a problem in the light_spark solution, but here removing the .0 from 10.0 will
+    # result in a ClassCast Exception
+    tolerances = [10.0**tol_exp for tol_exp in range(tol_start,tol_end-1,-1)]
+    print(tolerances)
+    iterations = [10**iter_exp for iter_exp in range(iter_start,iter_end+1,1)]
+    print(iterations)
+    grid = ParamGridBuilder().addGrid(linSVC.maxIter, iterations).addGrid(linSVC.tol,tolerances).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    cv = CrossValidator(estimator=linSVC,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    cvModel = cv.fit(df)
+    # print(cvModel.getEstimator())
+    # print(cvModel.getEstimatorParamMaps())
+    # print(cvModel.avgMetrics)    
+    
+    result = evaluator.evaluate(cvModel.transform(df))
+    print('linSVC:tol',cvModel.bestModel._java_obj.getTol(),':maxIter',cvModel.bestModel._java_obj.getMaxIter(),cvModel.bestModel.coefficients, result)
+
+def linSVC_with_tol_iter_fixed(df,tolerance,iterations):
+    linSVC = LinearSVC(featuresCol='features',labelCol='label')
+    grid = ParamGridBuilder().addGrid(linSVC.maxIter,iterations).addGrid(linSVC.tol,tolerance).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    tts = TrainValidationSplit(estimator=linSVC,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    ttsModel = tts.fit(df)
+    result = evaluator.evaluate(ttsModel.transform(df))
+    print('linSVC:tol',tolerance,':maxIter',iterations,':result',result)
+
+def binLR_with_tol_iter_search(df,tol_start=0, tol_end=-9, iter_start=0, iter_end=7):
+    binLR = LogisticRegression(featuresCol='features',labelCol='label')
+    # funniest thing, LinearSVC expects a double for its tol parameter and an integer for iterations
+    # somehow this wasn't a problem in the light_spark solution, but here removing the .0 from 10.0 will
+    # result in a ClassCast Exception
+    tolerances = [10.0**tol_exp for tol_exp in range(tol_start,tol_end-1,-1)]
+    print(tolerances)
+    iterations = [10**iter_exp for iter_exp in range(iter_start,iter_end+1,1)]
+    print(iterations)
+    grid = ParamGridBuilder().addGrid(binLR.maxIter, iterations).addGrid(binLR.tol,tolerances).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    cv = CrossValidator(estimator=binLR,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    cvModel = cv.fit(df)
+    #print(cvModel.getEstimator())
+    #print(cvModel.getEstimatorParamMaps())
+    #print(cvModel.avgMetrics)    
+    
+    result = evaluator.evaluate(cvModel.transform(df))
+    print('linSVC:tol',cvModel.bestModel._java_obj.getTol(),':maxIter',cvModel.bestModel._java_obj.getMaxIter(),cvModel.bestModel.coefficients, result)
+
+def binLR_with_tol_iter_fixed(df,tolerance,iterations):
+    binLR = LogisticRegression(featuresCol='features',labelCol='label')
+    grid = ParamGridBuilder().addGrid(binLR.maxIter,iterations).addGrid(binLR.tol,tolerance).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    tts = TrainValidationSplit(estimator=binLR,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    ttsModel = tts.fit(df)
+    result = evaluator.evaluate(ttsModel.transform(df))
+    print('binLR:tol',tolerance,':maxIter',iterations,'result',result)
+
+def DTree_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=251):
+    DTree = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)
+    features = list(range(2,max_features,1))
+    features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
+    depths = list(range(1,max_depth+1,1))
+    grid = ParamGridBuilder().addGrid(DTree.maxDepth,depths).addGrid(DTree.maxBins,features).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    cv = CrossValidator(estimator=DTree,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    cvModel = cv.fit(df)
+    result = evaluator.evaluate(cvModel.transform(df))
+    print('DTree:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(),cvModel.bestModel.coefficients, result)
+
+def DTree_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
+    DTree = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
+    grid = ParamGridBuilder().addGrid(DTree.maxDepth,max_depth).addGrid(Dtree.maxBins,max_features)
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    tts = TrainValidationSplit(estimator=DTree,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    ttsModel = tts.fit(df)
+    result = evaluator.evaluate(ttsModel.transform(df))
+    print('DTree:maxDepth',max_depth,':maxBins',max_features,':result',result)
+
+def RForest_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=251):
+    RForest = RandomForestClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)
+    features = list(range(2,max_features,1))
+    features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
+    depths = list(range(1,max_depth+1,1))
+    grid = ParamGridBuilder().addGrid(RForest.maxDepth,depths).addGrid(RForest.maxBins,features).build()
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    cv = CrossValidator(estimator=RForest,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
+    cvModel = cv.fit(df)
+    result = evaluator.evaluate(cvModel.transform(df))
+    print('RForest:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(),cvModel.bestModel.coefficients, result)
+
+def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
+    RForest = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
+    grid = ParamGridBuilder().addGrid(RForest.maxDepth,max_depth).addGrid(RForest.maxBins,max_features)
+    evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
+    tts = TrainValidationSplit(estimator=RForest,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
+    ttsModel = tts.fit(df)
+    result = evaluator.evaluate(ttsModel.transform(df))
+    print('RForest:maxDepth',max_depth,':maxBins',max_features,':result',result)
 
 if A == 'kNN':
     kNN_with_k_search(df,k_start=1,k_end=101,k_step=4)
+elif A == 'linSVC':
+    crossed = linSVC_with_tol_iter_search(df, tol_start=-4, tol_end=-4, iter_start=3, iter_end=3)
+elif A == 'binLR':
+    crossed = binLR_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+elif A == 'DTree':
+    crossed = DTree_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
+elif A == 'RForest':
+    crossed = RForest_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
     
-    
+print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
     
     
 '''

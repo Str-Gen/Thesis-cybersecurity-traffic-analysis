@@ -19,6 +19,9 @@ import itertools
 import operator
 import argparse
 import sys
+import math
+
+totaltime = time()
 
 # This is a simple test app. Use the following command to run assuming you're in the spark-knn folder:
 # SPARK_PRINT_LAUNCH_COMMAND=true spark-submit --py-files /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg --driver-class-path /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --jars /home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar --driver-memory 12g --num-executors 4 light_spark_NSL_KDD.py
@@ -269,9 +272,9 @@ def binLR_with_tol_iter_fixed():
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
 
 def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
-    possible_features = range(1,max_features,1)
+    possible_features = list(range(2,max_features,1))
     possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
-    for md in range(1,max_depth,4):
+    for md in range(1,max_depth+1,1):
         for mf in possible_features:
             sys.stdout.write('Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))
             sys.stdout.flush()
@@ -297,9 +300,9 @@ def DTree_with_maxFeatures_maxDepth_fixed(data,max_depth,max_features):
     return crossed
 
 def RForest_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=251):    
-    possible_features = range(1,max_features,1)
+    possible_features = list(range(2,max_features,1))
     possible_features.extend([round(math.sqrt(F)),round(math.log2(F)),F])
-    for md in range(1,max_depth,4):
+    for md in range(1,max_depth+1,1):
         for mf in possible_features:
             sys.stdout.write('Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))
             sys.stdout.flush()
@@ -345,9 +348,9 @@ for cross in range(0,3):
     elif A == 'binLR':
         crossed = binLR_with_tol_iter_search(data,cross=cross,tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
     elif A == 'DTree':
-        crossed = DTree_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=751,max_features=F)
+        crossed = DTree_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=30,max_features=F)
     elif A == 'RForest':
-        crossed = RForest_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=751,max_features=F)    
+        crossed = RForest_with_maxFeatures_maxDepth_search(data,cross=cross,max_depth=30,max_features=F)    
         
 for k in crossed:
     accs = [item[0] for item in crossed[k]]
@@ -358,6 +361,8 @@ validated = sorted(crossed.items(), key=lambda s:s[1] ,reverse=True)
 for topn in range(0,len(crossed)) if len(crossed)<5 else range(0,5):
     # print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
     print(validated[topn])
+
+print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
 
 '''
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features (F41)
