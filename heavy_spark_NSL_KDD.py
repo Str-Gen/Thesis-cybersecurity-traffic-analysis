@@ -12,6 +12,7 @@ from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark_knn.ml.classification import KNNClassifier
 from pyspark.ml.classification import LinearSVC, LogisticRegression, DecisionTreeClassifier, RandomForestClassifier 
 from time import time
+from datetime import timedelta
 import numpy as np
 import pandas as pd
 import random
@@ -217,7 +218,8 @@ min_max_column_udf = udf(lambda x, mi, ma: (x-mi)/(ma-mi), DoubleType())
 for column in numeric_cols:    
     minimum = train_df.agg({column:'min'}).collect()[0][0]
     maximum = train_df.agg({column:'max'}).collect()[0][0]
-    train_df = train_df.withColumn(column,min_max_column_udf(train_df[column],lit(minimum),lit(maximum)))
+    if (maximum - minimum) > 0 :
+        train_df = train_df.withColumn(column,min_max_column_udf(train_df[column],lit(minimum),lit(maximum)))
 
 #train_df.show(n=5,truncate=False,vertical=True)    
 
@@ -259,11 +261,12 @@ def kNN_with_k_search(df, k_start=1, k_end=101, k_step=4):
 
 def kNN_with_k_fixed(df,k):
     knn = KNNClassifier(featuresCol='features', labelCol='label', topTreeSize=1000, topTreeLeafSize=10, subTreeLeafSize=30)
-    grid = ParamGridBuilder(knn.k,k).build()
+    grid = ParamGridBuilder().addGrid(knn.k,[k]).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=knn,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
     result = evaluator.evaluate(ttsModel.transform(df))
+    print('kNN:k',k,result)
 
 def linSVC_with_tol_iter_search(df,tol_start=0, tol_end=-9, iter_start=0, iter_end=7):
     linSVC = LinearSVC(featuresCol='features',labelCol='label')
@@ -287,7 +290,7 @@ def linSVC_with_tol_iter_search(df,tol_start=0, tol_end=-9, iter_start=0, iter_e
 
 def linSVC_with_tol_iter_fixed(df,tolerance,iterations):
     linSVC = LinearSVC(featuresCol='features',labelCol='label')
-    grid = ParamGridBuilder().addGrid(linSVC.maxIter,iterations).addGrid(linSVC.tol,tolerance).build()
+    grid = ParamGridBuilder().addGrid(linSVC.maxIter,[iterations]).addGrid(linSVC.tol,[tolerance]).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=linSVC,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -316,7 +319,7 @@ def binLR_with_tol_iter_search(df,tol_start=0, tol_end=-9, iter_start=0, iter_en
 
 def binLR_with_tol_iter_fixed(df,tolerance,iterations):
     binLR = LogisticRegression(featuresCol='features',labelCol='label')
-    grid = ParamGridBuilder().addGrid(binLR.maxIter,iterations).addGrid(binLR.tol,tolerance).build()
+    grid = ParamGridBuilder().addGrid(binLR.maxIter,[iterations]).addGrid(binLR.tol,[tolerance]).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=binLR,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -333,11 +336,11 @@ def DTree_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
     cv = CrossValidator(estimator=DTree,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
     cvModel = cv.fit(df)
     result = evaluator.evaluate(cvModel.transform(df))
-    print('DTree:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(),cvModel.bestModel.coefficients, result)
+    print('DTree:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(), result)
 
 def DTree_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     DTree = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
-    grid = ParamGridBuilder().addGrid(DTree.maxDepth,max_depth).addGrid(Dtree.maxBins,max_features)
+    grid = ParamGridBuilder().addGrid(DTree.maxDepth,[max_depth]).addGrid(Dtree.maxBins,[max_features])
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=DTree,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -354,11 +357,11 @@ def RForest_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
     cv = CrossValidator(estimator=RForest,estimatorParamMaps=grid,evaluator=evaluator,parallelism=4,numFolds=3)
     cvModel = cv.fit(df)
     result = evaluator.evaluate(cvModel.transform(df))
-    print('RForest:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(),cvModel.bestModel.coefficients, result)
+    print('RForest:maxDepth',cvModel.bestModel._java_obj.getMaxDepth(),':maxBins',cvModel.bestModel._java_obj.getMaxBins(), result)
 
 def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     RForest = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
-    grid = ParamGridBuilder().addGrid(RForest.maxDepth,max_depth).addGrid(RForest.maxBins,max_features)
+    grid = ParamGridBuilder().addGrid(RForest.maxDepth,[max_depth]).addGrid(RForest.maxBins,[max_features])
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=RForest,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -366,7 +369,7 @@ def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     print('RForest:maxDepth',max_depth,':maxBins',max_features,':result',result)
 
 if A == 'kNN':
-    kNN_with_k_search(df,k_start=1,k_end=51,k_step=2)
+    kNN_with_k_search(df,k_start=1,k_end=51,k_step=2)    
 elif A == 'linSVC':
     crossed = linSVC_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
 elif A == 'binLR':
@@ -376,7 +379,7 @@ elif A == 'DTree':
 elif A == 'RForest':
     crossed = RForest_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
     
-print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
+print('Total time elapsed',str(timedelta(seconds=time()-totaltime)))
 print('Features',F,'Algorithm',A)    
     
 '''

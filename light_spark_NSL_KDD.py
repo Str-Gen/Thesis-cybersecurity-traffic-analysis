@@ -12,6 +12,7 @@ from pyspark_knn.ml.classification import KNNClassifier
 from pyspark.ml.classification import LinearSVC, LogisticRegression, DecisionTreeClassifier, RandomForestClassifier
 
 from time import time
+from datetime import timedelta
 import numpy as np
 import pandas as pd
 import random
@@ -362,7 +363,7 @@ for topn in range(0,len(crossed)) if len(crossed)<5 else range(0,5):
     # print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
     print(validated[topn])
 
-print('Total time elapsed',strftime('%H:%M:%S',time()-totaltime()))
+print('Total time elapsed',str(timedelta(seconds=time()-totaltime)))
 print('Features',F,'Algorithm',A)    
 
 '''
@@ -391,16 +392,3 @@ Top 4 results show that k=1 yields the highest accuracy 28min 48s runtime intel 
 (9, [0.9762068651232392, 0.0, 8.55370044708252, 0.0])
 (13, [0.9743859583347232, 0.0, 9.539605140686035, 0.0])
 '''
-
-
-# OLD STEP
-# newrows,newcols = pandas_df.shape
-# one_promille_rowcount = int(round(newrows/1000))
-# # For all the numerical columns, shave off the rows with the one promille highest and lowest values
-# for c in numeric_cols:
-#     one_percent_largest = pandas_df.nlargest(one_promille_rowcount,c)
-#     one_percent_smallest = pandas_df.nsmallest(one_promille_rowcount,c)
-#     largest_row_indices, _ = one_percent_largest.axes    
-#     smallest_row_indices, _ = one_percent_smallest.axes
-#     to_drop = set(largest_row_indices) | set(smallest_row_indices)    
-#     pandas_df = pandas_df.drop(to_drop,axis=0)

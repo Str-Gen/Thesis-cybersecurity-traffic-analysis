@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from time import time
+from datetime import timedelta
 import argparse
 from collections import OrderedDict
 from sklearn import model_selection
@@ -19,6 +20,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 # %matplotlib inline
+
+totaltime = time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-F", "--features", action="store", dest="F",
@@ -360,6 +363,10 @@ for topn in range(0, len(crossed)) if len(crossed) < 5 else range(0, 5):
     # print '#',topn,'avg acc: {} stdev acc: {} avg time: {} stddev time: {}'.format(*validated[topn])
     print validated[topn]
 
+
+print('Total time elapsed',str(timedelta(seconds=time()-totaltime)))
+print('Features',F,'Algorithm',A)    
+    
 ''' 
 Full dataset, 2/3 train, 1/3 test, 3-fold validation, k 1->97 (range(1,101,4)), 122 features
 Top 4 results show that k=1 yields the highest accuracy 2h 37min 33s runtime intel core i5 4690 @3.5GHz
@@ -390,52 +397,52 @@ Top 4 results show that k=1 yields the highest accuracy 47min 43s runtime intel 
 # Fine-grained dictionary, packets are normal or attacks, and the attacks are divided into 4 subcategories
 
 # Dictionary that contains mapping of various attacks to the four main categories
-attack_dict = {
-    'normal': 'normal',
+# attack_dict = {
+#     'normal': 'normal',
 
-    'back': 'DoS',
-    'land': 'DoS',
-    'neptune': 'DoS',
-    'pod': 'DoS',
-    'smurf': 'DoS',
-    'teardrop': 'DoS',
-    'mailbomb': 'DoS',
-    'apache2': 'DoS',
-    'processtable': 'DoS',
-    'udpstorm': 'DoS',
+#     'back': 'DoS',
+#     'land': 'DoS',
+#     'neptune': 'DoS',
+#     'pod': 'DoS',
+#     'smurf': 'DoS',
+#     'teardrop': 'DoS',
+#     'mailbomb': 'DoS',
+#     'apache2': 'DoS',
+#     'processtable': 'DoS',
+#     'udpstorm': 'DoS',
 
-    'ipsweep': 'Probe',
-    'nmap': 'Probe',
-    'portsweep': 'Probe',
-    'satan': 'Probe',
-    'mscan': 'Probe',
-    'saint': 'Probe',
+#     'ipsweep': 'Probe',
+#     'nmap': 'Probe',
+#     'portsweep': 'Probe',
+#     'satan': 'Probe',
+#     'mscan': 'Probe',
+#     'saint': 'Probe',
 
-    'ftp_write': 'R2L',
-    'guess_passwd': 'R2L',
-    'imap': 'R2L',
-    'multihop': 'R2L',
-    'phf': 'R2L',
-    'spy': 'R2L',
-    'warezclient': 'R2L',
-    'warezmaster': 'R2L',
-    'sendmail': 'R2L',
-    'named': 'R2L',
-    'snmpgetattack': 'R2L',
-    'snmpguess': 'R2L',
-    'xlock': 'R2L',
-    'xsnoop': 'R2L',
-    'worm': 'R2L',
+#     'ftp_write': 'R2L',
+#     'guess_passwd': 'R2L',
+#     'imap': 'R2L',
+#     'multihop': 'R2L',
+#     'phf': 'R2L',
+#     'spy': 'R2L',
+#     'warezclient': 'R2L',
+#     'warezmaster': 'R2L',
+#     'sendmail': 'R2L',
+#     'named': 'R2L',
+#     'snmpgetattack': 'R2L',
+#     'snmpguess': 'R2L',
+#     'xlock': 'R2L',
+#     'xsnoop': 'R2L',
+#     'worm': 'R2L',
 
-    'buffer_overflow': 'U2R',
-    'loadmodule': 'U2R',
-    'perl': 'U2R',
-    'rootkit': 'U2R',
-    'httptunnel': 'U2R',
-    'ps': 'U2R',
-    'sqlattack': 'U2R',
-    'xterm': 'U2R'
-}
+#     'buffer_overflow': 'U2R',
+#     'loadmodule': 'U2R',
+#     'perl': 'U2R',
+#     'rootkit': 'U2R',
+#     'httptunnel': 'U2R',
+#     'ps': 'U2R',
+#     'sqlattack': 'U2R',
+#     'xterm': 'U2R'
+# }
 
 # OLD STEP
 # newrows,newcols = dataframe.shape
