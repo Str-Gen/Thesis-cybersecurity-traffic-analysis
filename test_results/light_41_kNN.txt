@@ -1,66 +1,4 @@
-/usr/bin/hadoop
-2018-06-06 06:55:41 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2018-06-06 06:55:42 INFO  SparkContext:54 - Running Spark version 2.3.0
-2018-06-06 06:55:42 INFO  SparkContext:54 - Submitted application: lightweight_knn_nslkdd
-2018-06-06 06:55:42 INFO  SecurityManager:54 - Changing view acls to: dhoogla
-2018-06-06 06:55:42 INFO  SecurityManager:54 - Changing modify acls to: dhoogla
-2018-06-06 06:55:42 INFO  SecurityManager:54 - Changing view acls groups to: 
-2018-06-06 06:55:42 INFO  SecurityManager:54 - Changing modify acls groups to: 
-2018-06-06 06:55:42 INFO  SecurityManager:54 - SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(dhoogla); groups with view permissions: Set(); users  with modify permissions: Set(dhoogla); groups with modify permissions: Set()
-2018-06-06 06:55:42 INFO  Utils:54 - Successfully started service 'sparkDriver' on port 33243.
-2018-06-06 06:55:42 INFO  SparkEnv:54 - Registering MapOutputTracker
-2018-06-06 06:55:42 INFO  SparkEnv:54 - Registering BlockManagerMaster
-2018-06-06 06:55:42 INFO  BlockManagerMasterEndpoint:54 - Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
-2018-06-06 06:55:42 INFO  BlockManagerMasterEndpoint:54 - BlockManagerMasterEndpoint up
-2018-06-06 06:55:42 INFO  DiskBlockManager:54 - Created local directory at /tmp/blockmgr-18c0b6a5-b4fa-4a6c-bd0f-354333076133
-2018-06-06 06:55:42 INFO  MemoryStore:54 - MemoryStore started with capacity 6.2 GB
-2018-06-06 06:55:42 INFO  SparkEnv:54 - Registering OutputCommitCoordinator
-2018-06-06 06:55:42 INFO  log:192 - Logging initialized @1609ms
-2018-06-06 06:55:42 INFO  Server:346 - jetty-9.3.z-SNAPSHOT
-2018-06-06 06:55:42 INFO  Server:414 - Started @1659ms
-2018-06-06 06:55:42 INFO  AbstractConnector:278 - Started ServerConnector@7ecab740{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
-2018-06-06 06:55:42 INFO  Utils:54 - Successfully started service 'SparkUI' on port 4040.
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@26609979{/jobs,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@585a43a8{/jobs/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@628dd861{/jobs/job,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3bf3f5a9{/jobs/job/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@31bea67c{/stages,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3d7c2efa{/stages/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7a428499{/stages/stage,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@46265e62{/stages/stage/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@282e6c73{/stages/pool,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@35cd47f3{/stages/pool/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@22ea991a{/storage,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@56cb166b{/storage/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@d5da535{/storage/rdd,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@52f099b2{/storage/rdd/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@2424e8bf{/environment,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@2a52da1e{/environment/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@4a46a66c{/executors,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1c2d9b9f{/executors/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1f4fe9b5{/executors/threadDump,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@23714268{/executors/threadDump/json,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5c7be5ac{/static,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5951a5c0{/,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5cfc826e{/api,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5d9b8ebc{/jobs/job/kill,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3857ca40{/stages/stage/kill,null,AVAILABLE,@Spark}
-2018-06-06 06:55:42 INFO  SparkUI:54 - Bound SparkUI to localhost, and started at http://localhost:4040
-2018-06-06 06:55:42 INFO  SparkContext:54 - Added JAR file:///home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar at spark://localhost:33243/jars/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar with timestamp 1528260942441
-2018-06-06 06:55:42 INFO  SparkContext:54 - Added file file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/light_spark_NSL_KDD.py at file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/light_spark_NSL_KDD.py with timestamp 1528260942442
-2018-06-06 06:55:42 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/light_spark_NSL_KDD.py to /tmp/spark-01a6b361-3be1-4205-85d4-836f88a07cbd/userFiles-b9cbd4ad-8ad5-4e21-bcf2-c85ffea5a5f5/light_spark_NSL_KDD.py
-2018-06-06 06:55:42 INFO  SparkContext:54 - Added file file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg at file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg with timestamp 1528260942449
-2018-06-06 06:55:42 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg to /tmp/spark-01a6b361-3be1-4205-85d4-836f88a07cbd/userFiles-b9cbd4ad-8ad5-4e21-bcf2-c85ffea5a5f5/pyspark_knn-0.1-py3.6.egg
-2018-06-06 06:55:42 INFO  Executor:54 - Starting executor ID driver on host localhost
-2018-06-06 06:55:42 INFO  Utils:54 - Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 32967.
-2018-06-06 06:55:42 INFO  NettyBlockTransferService:54 - Server created on localhost:32967
-2018-06-06 06:55:42 INFO  BlockManager:54 - Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
-2018-06-06 06:55:42 INFO  BlockManagerMaster:54 - Registering BlockManager BlockManagerId(driver, localhost, 32967, None)
-2018-06-06 06:55:42 INFO  BlockManagerMasterEndpoint:54 - Registering block manager localhost:32967 with 6.2 GB RAM, BlockManagerId(driver, localhost, 32967, None)
-2018-06-06 06:55:42 INFO  BlockManagerMaster:54 - Registered BlockManager BlockManagerId(driver, localhost, 32967, None)
-2018-06-06 06:55:42 INFO  BlockManager:54 - Initialized BlockManager: BlockManagerId(driver, localhost, 32967, None)
-2018-06-06 06:55:42 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@bcf4fff{/metrics/json,null,AVAILABLE,@Spark}
-Round 0, k = 1 Round 0, k = 3 Round 0, k = 5 Round 0, k = 7 Round 0, k = 9 Round 0, k = 11 Round 0, k = 13 Round 0, k = 15 Round 0, k = 17 Round 0, k = 19 Round 0, k = 21 Round 0, k = 23 Round 0, k = 25 Round 0, k = 27 Round 0, k = 29 Round 0, k = 31 Round 0, k = 33 Round 0, k = 35 Round 0, k = 37 Round 0, k = 39 Round 0, k = 41 Round 0, k = 43 Round 0, k = 45 Round 0, k = 47 Round 0, k = 49 Round 1, k = 1 Round 1, k = 3 Round 1, k = 5 Round 1, k = 7 Round 1, k = 9 Round 1, k = 11 Round 1, k = 13 Round 1, k = 15 Round 1, k = 17 Round 1, k = 19 Round 1, k = 21 Round 1, k = 23 Round 1, k = 25 Round 1, k = 27 Round 1, k = 29 Round 1, k = 31 Round 1, k = 33 Round 1, k = 35 Round 1, k = 37 Round 1, k = 39 Round 1, k = 41 Round 1, k = 43 Round 1, k = 45 Round 1, k = 47 Round 1, k = 49 Round 2, k = 1 Round 2, k = 3 Round 2, k = 5 Round 2, k = 7 Round 2, k = 9 Round 2, k = 11 Round 2, k = 13 Round 2, k = 15 Round 2, k = 17 Round 2, k = 19 Round 2, k = 21 Round 2, k = 23 Round 2, k = 25 Round 2, k = 27 Round 2, k = 29 Round 2, k = 31 Round 2, k = 33 Round 2, k = 35 Round 2, k = 37 Round 2, k = 39 Round 2, k = 41 Round 2, k = 43 Round 2, k = 45 Round 2, k = 47 Round 2, k = 49 ('knn:k1', [0.9964924496149893, 0.0, 18.417627334594727, 0.0])
+('knn:k1', [0.9964924496149893, 0.0, 18.417627334594727, 0.0])
 ('knn:k3', [0.9950214701570208, 0.0, 27.993186473846436, 0.0])
 ('knn:k5', [0.9942485619540294, 0.0, 39.15087890625, 0.0])
 ('knn:k7', [0.9935078595787822, 0.0, 51.14610028266907, 0.0])
