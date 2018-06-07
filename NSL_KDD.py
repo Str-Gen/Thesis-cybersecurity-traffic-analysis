@@ -6,8 +6,6 @@ import operator
 import sys
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from time import time
 from datetime import timedelta
 import argparse
@@ -245,7 +243,7 @@ def binLR_with_tol_iter_search(data, cross=0, tol_start=0, tol_end=-9, iter_star
             gt0 = time()
             crossed['binLR:tol1e'+repr(tol_exp)+':iter1e'+repr(iter_exp)] = []
             classifier = LogisticRegression(
-                penalty='l2', tol=10**tol_exp, max_iter=10**iter_exp, dual=False, n_jobs=-1)
+                penalty='l2', tol=10**tol_exp, max_iter=10**iter_exp, dual=False, n_jobs=-1, solver='lbfgs')
             classifier.fit(data['X_train'], data['Y_train'])
             result = classifier.score(data['X_test'], data['Y_test'])
             crossed['binLR:tol1e'+repr(tol_exp)+':iter1e' +
@@ -256,7 +254,7 @@ def binLR_with_tol_iter_search(data, cross=0, tol_start=0, tol_end=-9, iter_star
 def binLR_with_tol_iter_fixed(data, tolerance, iterations):
     gt0 = time()
     classifier = LogisticRegression(
-        penalty='l2', tol=tolerance, max_iter=iterations, dual=False, n_jobs=-1)
+        penalty='l2', tol=tolerance, max_iter=iterations, dual=False, n_jobs=-1, solver='lbfgs')
     classifier.fit(X_train, Y_train)
     result = classifier.score(X_test, Y_test)
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)] = []
@@ -266,9 +264,9 @@ def binLR_with_tol_iter_fixed(data, tolerance, iterations):
 
 
 def DTree_with_maxFeatures_maxDepth_search(data, cross=0, max_depth=5, max_features=251):
-    possible_features = range(1, max_features, 1)
+    possible_features = range(2, max_features, 1)
     possible_features.extend(['sqrt', 'log2', None])
-    for md in range(1, max_depth, 4):
+    for md in range(1, max_depth+1, 1):
         for mf in possible_features:
             sys.stdout.write(
                 'Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))
@@ -297,9 +295,9 @@ def DTree_with_maxFeatures_maxDepth_fixed(data, max_depth, max_features):
 
 
 def RForest_with_maxFeatures_maxDepth_search(data, cross=0, max_depth=5, max_features=251):
-    possible_features = range(1, max_features, 1)
+    possible_features = range(2, max_features, 1)
     possible_features.extend(['sqrt', 'log2', None])
-    for md in range(1, max_depth, 4):
+    for md in range(1, max_depth+1, 1):
         for mf in possible_features:
             sys.stdout.write(
                 'Round %d Testing max_depth = %d with max_features = %s \r' % (cross, md, mf))

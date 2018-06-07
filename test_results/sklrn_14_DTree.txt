@@ -1,0 +1,7 @@
+('DTree:maxFeatures7:maxDepth23', [0.9582170691811797, 0.0, 0.055459022521972656, 0.0])
+('DTree:maxFeatures9:maxDepth22', [0.9579284133551429, 0.0, 0.06623387336730957, 0.0])
+('DTree:maxFeatures7:maxDepth26', [0.9578803040508034, 0.0, 0.05533790588378906, 0.0])
+('DTree:maxFeatures12:maxDepth24', [0.9578803040508034, 0.0, 0.08187508583068848, 0.0])
+('DTree:maxFeatures4:maxDepth25', [0.957832194746464, 0.0, 0.04075980186462402, 0.0])
+('Total time elapsed', '0:01:09.281042')
+('Features', 14, 'Algorithm', 'DTree')

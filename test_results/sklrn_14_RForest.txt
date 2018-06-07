@@ -1,0 +1,7 @@
+('RForest:maxFeatures2:maxDepth24', [0.9589146540941018, 0.0, 0.37859106063842773, 0.0])
+("RForest:maxFeatures'log2':maxDepth18", [0.9588424901375926, 0.0, 0.38352489471435547, 0.0])
+('RForest:maxFeatures7:maxDepth26', [0.9587943808332532, 0.0, 0.37178802490234375, 0.0])
+('RForest:maxFeatures6:maxDepth19', [0.9587943808332532, 0.0, 0.3658120632171631, 0.0])
+('RForest:maxFeatures5:maxDepth24', [0.9587943808332532, 0.0, 0.3993711471557617, 0.0])
+('Total time elapsed', '0:08:34.763315')
+('Features', 14, 'Algorithm', 'RForest')
