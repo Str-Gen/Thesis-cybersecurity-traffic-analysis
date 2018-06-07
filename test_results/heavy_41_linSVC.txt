@@ -1,0 +1,345 @@
+/usr/bin/hadoop
+2018-06-06 11:36:06 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2018-06-06 11:36:07 INFO  SparkContext:54 - Running Spark version 2.3.0
+2018-06-06 11:36:07 INFO  SparkContext:54 - Submitted application: spark_knn_nslkdd
+2018-06-06 11:36:07 INFO  SecurityManager:54 - Changing view acls to: dhoogla
+2018-06-06 11:36:07 INFO  SecurityManager:54 - Changing modify acls to: dhoogla
+2018-06-06 11:36:07 INFO  SecurityManager:54 - Changing view acls groups to: 
+2018-06-06 11:36:07 INFO  SecurityManager:54 - Changing modify acls groups to: 
+2018-06-06 11:36:07 INFO  SecurityManager:54 - SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(dhoogla); groups with view permissions: Set(); users  with modify permissions: Set(dhoogla); groups with modify permissions: Set()
+2018-06-06 11:36:07 INFO  Utils:54 - Successfully started service 'sparkDriver' on port 34411.
+2018-06-06 11:36:07 INFO  SparkEnv:54 - Registering MapOutputTracker
+2018-06-06 11:36:07 INFO  SparkEnv:54 - Registering BlockManagerMaster
+2018-06-06 11:36:07 INFO  BlockManagerMasterEndpoint:54 - Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+2018-06-06 11:36:07 INFO  BlockManagerMasterEndpoint:54 - BlockManagerMasterEndpoint up
+2018-06-06 11:36:07 INFO  DiskBlockManager:54 - Created local directory at /tmp/blockmgr-087e4a95-27aa-4df7-9227-c4c53b6aa778
+2018-06-06 11:36:07 INFO  MemoryStore:54 - MemoryStore started with capacity 6.2 GB
+2018-06-06 11:36:07 INFO  SparkEnv:54 - Registering OutputCommitCoordinator
+2018-06-06 11:36:08 INFO  log:192 - Logging initialized @1650ms
+2018-06-06 11:36:08 INFO  Server:346 - jetty-9.3.z-SNAPSHOT
+2018-06-06 11:36:08 INFO  Server:414 - Started @1696ms
+2018-06-06 11:36:08 INFO  AbstractConnector:278 - Started ServerConnector@78ca71f2{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
+2018-06-06 11:36:08 INFO  Utils:54 - Successfully started service 'SparkUI' on port 4040.
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7ea89f02{/jobs,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1cf618eb{/jobs/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@28e4bbb{/jobs/job,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@51c0669b{/jobs/job/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7d5d1d08{/stages,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@d7e428b{/stages/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@4ea5c072{/stages/stage,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@763609f3{/stages/stage/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1670f117{/stages/pool,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@166ff7d1{/stages/pool/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@41ccc92{/storage,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@42a33473{/storage/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@534a8d79{/storage/rdd,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3af229be{/storage/rdd/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@58e80a2e{/environment,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3b3adec{/environment/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@495c9a6{/executors,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@2f81af53{/executors/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@372079f7{/executors/threadDump,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@29627e32{/executors/threadDump/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3105a41{/static,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@50ebf454{/,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@4a65275{/api,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@f989644{/jobs/job/kill,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@542a8472{/stages/stage/kill,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  SparkUI:54 - Bound SparkUI to localhost, and started at http://localhost:4040
+2018-06-06 11:36:08 INFO  SparkContext:54 - Added JAR file:///home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar at spark://localhost:34411/jars/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar with timestamp 1528277768127
+2018-06-06 11:36:08 INFO  SparkContext:54 - Added file file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py at file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py with timestamp 1528277768128
+2018-06-06 11:36:08 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py to /tmp/spark-7eaa7677-6440-4b3e-abed-964295d0d9a9/userFiles-7d63ba7e-4150-4809-873e-655d05c22c03/heavy_spark_NSL_KDD.py
+2018-06-06 11:36:08 INFO  SparkContext:54 - Added file file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg at file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg with timestamp 1528277768136
+2018-06-06 11:36:08 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg to /tmp/spark-7eaa7677-6440-4b3e-abed-964295d0d9a9/userFiles-7d63ba7e-4150-4809-873e-655d05c22c03/pyspark_knn-0.1-py3.6.egg
+2018-06-06 11:36:08 INFO  Executor:54 - Starting executor ID driver on host localhost
+2018-06-06 11:36:08 INFO  Utils:54 - Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 46451.
+2018-06-06 11:36:08 INFO  NettyBlockTransferService:54 - Server created on localhost:46451
+2018-06-06 11:36:08 INFO  BlockManager:54 - Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+2018-06-06 11:36:08 INFO  BlockManagerMaster:54 - Registering BlockManager BlockManagerId(driver, localhost, 46451, None)
+2018-06-06 11:36:08 INFO  BlockManagerMasterEndpoint:54 - Registering block manager localhost:46451 with 6.2 GB RAM, BlockManagerId(driver, localhost, 46451, None)
+2018-06-06 11:36:08 INFO  BlockManagerMaster:54 - Registered BlockManager BlockManagerId(driver, localhost, 46451, None)
+2018-06-06 11:36:08 INFO  BlockManager:54 - Initialized BlockManager: BlockManagerId(driver, localhost, 46451, None)
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@482ac967{/metrics/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  SharedState:54 - Setting hive.metastore.warehouse.dir ('null') to the value of spark.sql.warehouse.dir ('file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/spark-warehouse/').
+2018-06-06 11:36:08 INFO  SharedState:54 - Warehouse path is 'file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/spark-warehouse/'.
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@269e9140{/SQL,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@43329a3c{/SQL/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5bf560f9{/SQL/execution,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@23ae5028{/SQL/execution/json,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@4ff10f8d{/static/sql,null,AVAILABLE,@Spark}
+2018-06-06 11:36:08 INFO  StateStoreCoordinatorRef:54 - Registered StateStoreCoordinator endpoint
+-RECORD 0-------------------------------------
+ duration                    | 0.0            
+ src_bytes                   | 491.0          
+ dst_bytes                   | 0.0            
+ land                        | 0.0            
+ wrong_fragment              | 0.0            
+ urgent                      | 0.0            
+ hot                         | 0.0            
+ num_failed_logins           | 0.0            
+ logged_in                   | 0.0            
+ num_compromised             | 0.0            
+ root_shell                  | 0.0            
+ su_attempted                | 0.0            
+ num_root                    | 0.0            
+ num_file_creations          | 0.0            
+ num_shells                  | 0.0            
+ num_access_files            | 0.0            
+ num_outbound_cmds           | 0.0            
+ is_host_login               | 0.0            
+ is_guest_login              | 0.0            
+ count                       | 2.0            
+ srv_count                   | 2.0            
+ serror_rate                 | 0.0            
+ srv_serror_rate             | 0.0            
+ rerror_rate                 | 0.0            
+ srv_rerror_rate             | 0.0            
+ same_srv_rate               | 1.0            
+ diff_srv_rate               | 0.0            
+ srv_diff_host_rate          | 0.0            
+ dst_host_count              | 150.0          
+ dst_host_srv_count          | 25.0           
+ dst_host_same_srv_rate      | 0.17           
+ dst_host_diff_srv_rate      | 0.03           
+ dst_host_same_src_port_rate | 0.17           
+ dst_host_srv_diff_host_rate | 0.0            
+ dst_host_serror_rate        | 0.0            
+ dst_host_srv_serror_rate    | 0.0            
+ dst_host_rerror_rate        | 0.05           
+ dst_host_srv_rerror_rate    | 0.0            
+ label                       | 0.0            
+ protocol_type_numeric       | (3,[0],[1.0])  
+ service_numeric             | (70,[4],[1.0]) 
+ flag_numeric                | (11,[0],[1.0]) 
+-RECORD 1-------------------------------------
+ duration                    | 0.0            
+ src_bytes                   | 146.0          
+ dst_bytes                   | 0.0            
+ land                        | 0.0            
+ wrong_fragment              | 0.0            
+ urgent                      | 0.0            
+ hot                         | 0.0            
+ num_failed_logins           | 0.0            
+ logged_in                   | 0.0            
+ num_compromised             | 0.0            
+ root_shell                  | 0.0            
+ su_attempted                | 0.0            
+ num_root                    | 0.0            
+ num_file_creations          | 0.0            
+ num_shells                  | 0.0            
+ num_access_files            | 0.0            
+ num_outbound_cmds           | 0.0            
+ is_host_login               | 0.0            
+ is_guest_login              | 0.0            
+ count                       | 13.0           
+ srv_count                   | 1.0            
+ serror_rate                 | 0.0            
+ srv_serror_rate             | 0.0            
+ rerror_rate                 | 0.0            
+ srv_rerror_rate             | 0.0            
+ same_srv_rate               | 0.08           
+ diff_srv_rate               | 0.15           
+ srv_diff_host_rate          | 0.0            
+ dst_host_count              | 255.0          
+ dst_host_srv_count          | 1.0            
+ dst_host_same_srv_rate      | 0.0            
+ dst_host_diff_srv_rate      | 0.6            
+ dst_host_same_src_port_rate | 0.88           
+ dst_host_srv_diff_host_rate | 0.0            
+ dst_host_serror_rate        | 0.0            
+ dst_host_srv_serror_rate    | 0.0            
+ dst_host_rerror_rate        | 0.0            
+ dst_host_srv_rerror_rate    | 0.0            
+ label                       | 0.0            
+ protocol_type_numeric       | (3,[1],[1.0])  
+ service_numeric             | (70,[6],[1.0]) 
+ flag_numeric                | (11,[0],[1.0]) 
+-RECORD 2-------------------------------------
+ duration                    | 0.0            
+ src_bytes                   | 0.0            
+ dst_bytes                   | 0.0            
+ land                        | 0.0            
+ wrong_fragment              | 0.0            
+ urgent                      | 0.0            
+ hot                         | 0.0            
+ num_failed_logins           | 0.0            
+ logged_in                   | 0.0            
+ num_compromised             | 0.0            
+ root_shell                  | 0.0            
+ su_attempted                | 0.0            
+ num_root                    | 0.0            
+ num_file_creations          | 0.0            
+ num_shells                  | 0.0            
+ num_access_files            | 0.0            
+ num_outbound_cmds           | 0.0            
+ is_host_login               | 0.0            
+ is_guest_login              | 0.0            
+ count                       | 123.0          
+ srv_count                   | 6.0            
+ serror_rate                 | 1.0            
+ srv_serror_rate             | 1.0            
+ rerror_rate                 | 0.0            
+ srv_rerror_rate             | 0.0            
+ same_srv_rate               | 0.05           
+ diff_srv_rate               | 0.07           
+ srv_diff_host_rate          | 0.0            
+ dst_host_count              | 255.0          
+ dst_host_srv_count          | 26.0           
+ dst_host_same_srv_rate      | 0.1            
+ dst_host_diff_srv_rate      | 0.05           
+ dst_host_same_src_port_rate | 0.0            
+ dst_host_srv_diff_host_rate | 0.0            
+ dst_host_serror_rate        | 1.0            
+ dst_host_srv_serror_rate    | 1.0            
+ dst_host_rerror_rate        | 0.0            
+ dst_host_srv_rerror_rate    | 0.0            
+ label                       | 1.0            
+ protocol_type_numeric       | (3,[0],[1.0])  
+ service_numeric             | (70,[1],[1.0]) 
+ flag_numeric                | (11,[1],[1.0]) 
+-RECORD 3-------------------------------------
+ duration                    | 0.0            
+ src_bytes                   | 232.0          
+ dst_bytes                   | 8153.0         
+ land                        | 0.0            
+ wrong_fragment              | 0.0            
+ urgent                      | 0.0            
+ hot                         | 0.0            
+ num_failed_logins           | 0.0            
+ logged_in                   | 1.0            
+ num_compromised             | 0.0            
+ root_shell                  | 0.0            
+ su_attempted                | 0.0            
+ num_root                    | 0.0            
+ num_file_creations          | 0.0            
+ num_shells                  | 0.0            
+ num_access_files            | 0.0            
+ num_outbound_cmds           | 0.0            
+ is_host_login               | 0.0            
+ is_guest_login              | 0.0            
+ count                       | 5.0            
+ srv_count                   | 5.0            
+ serror_rate                 | 0.2            
+ srv_serror_rate             | 0.2            
+ rerror_rate                 | 0.0            
+ srv_rerror_rate             | 0.0            
+ same_srv_rate               | 1.0            
+ diff_srv_rate               | 0.0            
+ srv_diff_host_rate          | 0.0            
+ dst_host_count              | 30.0           
+ dst_host_srv_count          | 255.0          
+ dst_host_same_srv_rate      | 1.0            
+ dst_host_diff_srv_rate      | 0.0            
+ dst_host_same_src_port_rate | 0.03           
+ dst_host_srv_diff_host_rate | 0.04           
+ dst_host_serror_rate        | 0.03           
+ dst_host_srv_serror_rate    | 0.01           
+ dst_host_rerror_rate        | 0.0            
+ dst_host_srv_rerror_rate    | 0.01           
+ label                       | 0.0            
+ protocol_type_numeric       | (3,[0],[1.0])  
+ service_numeric             | (70,[0],[1.0]) 
+ flag_numeric                | (11,[0],[1.0]) 
+-RECORD 4-------------------------------------
+ duration                    | 0.0            
+ src_bytes                   | 199.0          
+ dst_bytes                   | 420.0          
+ land                        | 0.0            
+ wrong_fragment              | 0.0            
+ urgent                      | 0.0            
+ hot                         | 0.0            
+ num_failed_logins           | 0.0            
+ logged_in                   | 1.0            
+ num_compromised             | 0.0            
+ root_shell                  | 0.0            
+ su_attempted                | 0.0            
+ num_root                    | 0.0            
+ num_file_creations          | 0.0            
+ num_shells                  | 0.0            
+ num_access_files            | 0.0            
+ num_outbound_cmds           | 0.0            
+ is_host_login               | 0.0            
+ is_guest_login              | 0.0            
+ count                       | 30.0           
+ srv_count                   | 32.0           
+ serror_rate                 | 0.0            
+ srv_serror_rate             | 0.0            
+ rerror_rate                 | 0.0            
+ srv_rerror_rate             | 0.0            
+ same_srv_rate               | 1.0            
+ diff_srv_rate               | 0.0            
+ srv_diff_host_rate          | 0.09           
+ dst_host_count              | 255.0          
+ dst_host_srv_count          | 255.0          
+ dst_host_same_srv_rate      | 1.0            
+ dst_host_diff_srv_rate      | 0.0            
+ dst_host_same_src_port_rate | 0.0            
+ dst_host_srv_diff_host_rate | 0.0            
+ dst_host_serror_rate        | 0.0            
+ dst_host_srv_serror_rate    | 0.0            
+ dst_host_rerror_rate        | 0.0            
+ dst_host_srv_rerror_rate    | 0.0            
+ label                       | 0.0            
+ protocol_type_numeric       | (3,[0],[1.0])  
+ service_numeric             | (70,[0],[1.0]) 
+ flag_numeric                | (11,[0],[1.0]) 
+only showing top 5 rows
+
+[1.0, 0.1, 0.01, 0.001, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]
+[1, 10, 100, 1000, 10000, 100000, 1000000, 10000000]
+2018-06-06 11:38:38 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:38:42 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:39:21 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:40:05 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:43:00 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:43:03 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:45:44 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:46:23 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:46:58 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:48:51 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:51:20 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:53:35 ERROR Utils:91 - Uncaught exception in thread heartbeat-receiver-event-loop-thread
+java.lang.NullPointerException
+	at org.apache.spark.util.CollectionAccumulator.value(AccumulatorV2.scala:466)
+	at org.apache.spark.util.CollectionAccumulator.value(AccumulatorV2.scala:441)
+	at org.apache.spark.scheduler.TaskSchedulerImpl$$anonfun$8$$anonfun$9.apply(TaskSchedulerImpl.scala:449)
+	at org.apache.spark.scheduler.TaskSchedulerImpl$$anonfun$8$$anonfun$9.apply(TaskSchedulerImpl.scala:449)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.Iterator$class.foreach(Iterator.scala:893)
+	at scala.collection.AbstractIterator.foreach(Iterator.scala:1336)
+	at scala.collection.IterableLike$class.foreach(IterableLike.scala:72)
+	at scala.collection.AbstractIterable.foreach(Iterable.scala:54)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at org.apache.spark.scheduler.TaskSchedulerImpl$$anonfun$8.apply(TaskSchedulerImpl.scala:449)
+	at org.apache.spark.scheduler.TaskSchedulerImpl$$anonfun$8.apply(TaskSchedulerImpl.scala:448)
+	at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)
+	at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.ArrayOps$ofRef.foreach(ArrayOps.scala:186)
+	at scala.collection.TraversableLike$class.flatMap(TraversableLike.scala:241)
+	at scala.collection.mutable.ArrayOps$ofRef.flatMap(ArrayOps.scala:186)
+	at org.apache.spark.scheduler.TaskSchedulerImpl.executorHeartbeatReceived(TaskSchedulerImpl.scala:448)
+	at org.apache.spark.HeartbeatReceiver$$anonfun$receiveAndReply$1$$anon$2$$anonfun$run$2.apply$mcV$sp(HeartbeatReceiver.scala:129)
+	at org.apache.spark.util.Utils$.tryLogNonFatalError(Utils.scala:1357)
+	at org.apache.spark.HeartbeatReceiver$$anonfun$receiveAndReply$1$$anon$2.run(HeartbeatReceiver.scala:128)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+2018-06-06 11:56:11 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:56:14 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:59:24 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:59:28 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:59:44 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 11:59:46 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 12:00:35 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 12:19:28 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 12:23:34 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+linSVC:tol 1e-05 :maxIter 100000 [-0.6516397565429681,62.758271862258475,455.74203960775645,-2.4032738534344054,5.55510376722026,-7.185197972398477,47.894181341435235,6.719708379266747,0.2535259964091592,6873.5969923257135,0.6543119799839558,-6.0917049785999255,-7442.2156095494265,-12.905274176571018,0.33735254836450346,-4.5770964400882965,0.0,-0.6082033399972259,-14.443313918729352,5.218241843546705,-3.6789677958996747,-0.6416629679623905,3.7120383721207206,0.2340160485871435,2.5511801517959727,-0.16179347615402234,-0.19321778032292192,0.4452943201360829,0.787316735443261,-1.1139143585107183,0.2326744054566308,0.5956931405827021,1.5744913521366224,1.492725422279155,-0.5171700121365408,1.820626030659102,0.8452487637559429,0.7037507660781626,-0.38067708878554074,-1.6840309745695405,0.08604726198984057,-1.3583844847363296,1.2904260547383855,-0.8110097141791175,-1.9648678046912043,-1.467221318103461,-0.04279962633846464,-1.4206631461453705,0.10642846865908419,-3.039078303478085,-1.764813716854664,-1.686481545722039,-1.3863848139500945,0.23593311494577754,1.9015320857519353,0.306111204707268,0.40869499949863264,1.9330951878813187,0.28583325613393656,1.7367169813769234,-1.6834878386809313,0.6964940727340092,0.3321428485029961,0.19690735588581418,-1.815983315490544,-1.4980764667770883,1.5695038957100818,1.8557983814997916,1.609561443668924,0.7804023051780411,0.8889336435908659,1.2901152561064917,2.2749190669055572,0.31077355238946713,1.1319097504568205,1.4314978664041966,0.37844278869759573,1.6398867976293265,1.9631310365734342,1.5901839882312994,1.1631974896751198,0.28278957267234467,5.7864446308729,1.4219300441262783,0.89374794770274,0.2592121261238258,0.5666910779405882,1.749268554895489,0.5914912392106291,-0.4009143552676386,0.2734787870799162,2.051322091663347,-2.5664431218650736,0.40675017600899044,-7.383070589601635,-1.6614941740532063,1.3527154138358763,1.4804999960799656,1.32273346121291,-2.0714607171435797,0.8919209646619308,-0.8580196099562325,-1.69952992934305,-1.6995029451819053,-0.669461217119937,2.5226356503361167,-1.3411276387773723,0.17795696838229583,0.17795696838229583,0.17795696838229583,0.1779555557114771,-0.4156936621403446,0.025533747094544267,-4.295027773907846,1.0550049727564297,-1.8856879481863458,-5.932375116269363,-2.1690866287453243,-3.708969954006241,2.27995390189597,-2.4154403507645963,0.2868943434589669] 0.979859926073015
+Total time elapsed 1:29:11.150198
+Features 41 Algorithm linSVC

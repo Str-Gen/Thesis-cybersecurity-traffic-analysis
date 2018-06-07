@@ -1,0 +1,141 @@
+/usr/bin/hadoop
+2018-06-06 01:47:32 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2018-06-06 01:47:33 INFO  SparkContext:54 - Running Spark version 2.3.0
+2018-06-06 01:47:33 INFO  SparkContext:54 - Submitted application: spark_knn_nslkdd
+2018-06-06 01:47:33 INFO  SecurityManager:54 - Changing view acls to: dhoogla
+2018-06-06 01:47:33 INFO  SecurityManager:54 - Changing modify acls to: dhoogla
+2018-06-06 01:47:33 INFO  SecurityManager:54 - Changing view acls groups to: 
+2018-06-06 01:47:33 INFO  SecurityManager:54 - Changing modify acls groups to: 
+2018-06-06 01:47:33 INFO  SecurityManager:54 - SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(dhoogla); groups with view permissions: Set(); users  with modify permissions: Set(dhoogla); groups with modify permissions: Set()
+2018-06-06 01:47:33 INFO  Utils:54 - Successfully started service 'sparkDriver' on port 33485.
+2018-06-06 01:47:33 INFO  SparkEnv:54 - Registering MapOutputTracker
+2018-06-06 01:47:33 INFO  SparkEnv:54 - Registering BlockManagerMaster
+2018-06-06 01:47:33 INFO  BlockManagerMasterEndpoint:54 - Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+2018-06-06 01:47:33 INFO  BlockManagerMasterEndpoint:54 - BlockManagerMasterEndpoint up
+2018-06-06 01:47:33 INFO  DiskBlockManager:54 - Created local directory at /tmp/blockmgr-3b7800ae-7a32-456c-89e5-c74f675e9202
+2018-06-06 01:47:33 INFO  MemoryStore:54 - MemoryStore started with capacity 6.2 GB
+2018-06-06 01:47:33 INFO  SparkEnv:54 - Registering OutputCommitCoordinator
+2018-06-06 01:47:33 INFO  log:192 - Logging initialized @1631ms
+2018-06-06 01:47:33 INFO  Server:346 - jetty-9.3.z-SNAPSHOT
+2018-06-06 01:47:33 INFO  Server:414 - Started @1677ms
+2018-06-06 01:47:33 INFO  AbstractConnector:278 - Started ServerConnector@8cae296{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
+2018-06-06 01:47:33 INFO  Utils:54 - Successfully started service 'SparkUI' on port 4040.
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7a7cd729{/jobs,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@6bfb6d27{/jobs/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1b0d96d0{/jobs/job,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@25297eb4{/jobs/job/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@150bad63{/stages,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@62470204{/stages/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5d390ea1{/stages/stage,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@21aeae99{/stages/stage/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3477e00b{/stages/pool,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5faca18e{/stages/pool/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@3a4cb3bc{/storage,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@6ec2180a{/storage/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@65beca61{/storage/rdd,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5f24a789{/storage/rdd/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@2a3e82{/environment,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7ed674c5{/environment/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@6d2844bc{/executors,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@17caae7f{/executors/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@46455c2a{/executors/threadDump,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@b78787b{/executors/threadDump/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@24dad00c{/static,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1981294e{/,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5c007411{/api,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@6300c6d0{/jobs/job/kill,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@1faf741b{/stages/stage/kill,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  SparkUI:54 - Bound SparkUI to localhost, and started at http://localhost:4040
+2018-06-06 01:47:33 INFO  SparkContext:54 - Added JAR file:///home/dhoogla/Documents/UGent/spark-knn/spark-knn-core/target/scala-2.11/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar at spark://localhost:33485/jars/spark-knn_2.11-0.0.1-84aecdb78cb7338fb2e49254f6fdddf508d7273f.jar with timestamp 1528242453582
+2018-06-06 01:47:33 INFO  SparkContext:54 - Added file file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py at file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py with timestamp 1528242453583
+2018-06-06 01:47:33 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/heavy_spark_NSL_KDD.py to /tmp/spark-625f234b-59bc-4e7f-885c-875ecc5884ca/userFiles-460a3b6c-c262-4af3-80eb-bf43f775c2b2/heavy_spark_NSL_KDD.py
+2018-06-06 01:47:33 INFO  SparkContext:54 - Added file file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg at file:///home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg with timestamp 1528242453590
+2018-06-06 01:47:33 INFO  Utils:54 - Copying /home/dhoogla/Documents/UGent/spark-knn/python/dist/pyspark_knn-0.1-py3.6.egg to /tmp/spark-625f234b-59bc-4e7f-885c-875ecc5884ca/userFiles-460a3b6c-c262-4af3-80eb-bf43f775c2b2/pyspark_knn-0.1-py3.6.egg
+2018-06-06 01:47:33 INFO  Executor:54 - Starting executor ID driver on host localhost
+2018-06-06 01:47:33 INFO  Utils:54 - Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 34595.
+2018-06-06 01:47:33 INFO  NettyBlockTransferService:54 - Server created on localhost:34595
+2018-06-06 01:47:33 INFO  BlockManager:54 - Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+2018-06-06 01:47:33 INFO  BlockManagerMaster:54 - Registering BlockManager BlockManagerId(driver, localhost, 34595, None)
+2018-06-06 01:47:33 INFO  BlockManagerMasterEndpoint:54 - Registering block manager localhost:34595 with 6.2 GB RAM, BlockManagerId(driver, localhost, 34595, None)
+2018-06-06 01:47:33 INFO  BlockManagerMaster:54 - Registered BlockManager BlockManagerId(driver, localhost, 34595, None)
+2018-06-06 01:47:33 INFO  BlockManager:54 - Initialized BlockManager: BlockManagerId(driver, localhost, 34595, None)
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@26cfccd4{/metrics/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  SharedState:54 - Setting hive.metastore.warehouse.dir ('null') to the value of spark.sql.warehouse.dir ('file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/spark-warehouse/').
+2018-06-06 01:47:33 INFO  SharedState:54 - Warehouse path is 'file:/home/dhoogla/Documents/UGent/Thesis-cybersecurity-traffic-analysis/spark-warehouse/'.
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@5dc179ce{/SQL,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@74c3d748{/SQL/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@21e64a26{/SQL/execution,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@7eb0cac9{/SQL/execution/json,null,AVAILABLE,@Spark}
+2018-06-06 01:47:33 INFO  ContextHandler:781 - Started o.s.j.s.ServletContextHandler@10a922a7{/static/sql,null,AVAILABLE,@Spark}
+2018-06-06 01:47:34 INFO  StateStoreCoordinatorRef:54 - Registered StateStoreCoordinator endpoint
+[1.0, 0.1, 0.01, 0.001, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]
+[1, 10, 100, 1000, 10000, 100000, 1000000, 10000000]
+2018-06-06 01:49:55 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:50:16 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:51:36 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:51:44 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:51:51 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:52:03 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:53:35 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:53:37 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:55:23 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:55:30 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:55:53 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:56:52 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:56:58 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:03 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:09 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:12 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:17 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:20 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:22 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:57:24 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:11 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:13 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:17 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:18 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:39 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 01:59:58 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:00:03 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:00:41 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:00:57 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:02 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:02 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:03 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:07 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:09 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:01:16 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:02:50 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:02:55 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:03:33 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:03:39 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:03:40 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:03:55 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:04:12 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:04:17 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:04:18 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:05:24 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:05:26 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:05:26 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:05:27 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:07:57 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:08:14 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:08:15 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:08:22 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:09:43 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:10:56 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:10:58 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:04 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:08 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:13 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:31 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:32 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:39 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:11:42 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:12:57 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:12:58 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:14:17 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+2018-06-06 02:14:29 ERROR OWLQN:27 - Failure! Resetting history: breeze.optimize.NaNHistory: 
+linSVC:tol 0.1 :maxIter 10 [2.4352678822867473,5.584760339121302,2.5597479276933814,0.5338391196067072,0.5562996515949278,0.8077930221683093,-0.8651998447328512,-0.3059119563006056,-0.8059644866065406,0.062375385960464595,0.8415244300012107,0.4012893293220418,0.5611102040143424,0.35470310800368776] 0.9174802618396626
+Total time elapsed 0:27:04.450710
+Features 14 Algorithm linSVC
