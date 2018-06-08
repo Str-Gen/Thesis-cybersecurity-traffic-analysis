@@ -1,0 +1,71 @@
+dst_bytes mean: 19779.1144213 stddev: 4021269.15144 max: 1309937401 mi: 0
+wrong_fragment mean: 0.0226874012685 stddev: 0.253529985952 max: 3 mi: 0
+count mean: 84.1075547935 stddev: 114.508607354 max: 511 mi: 0
+serror_rate mean: 0.2844845324 stddev: 0.446455624331 max: 1.0 mi: 0.0
+srv_serror_rate mean: 0.28248537385 stddev: 0.447022498364 max: 1.0 mi: 0.0
+srv_rerror_rate mean: 0.121183269431 stddev: 0.323647228005 max: 1.0 mi: 0.0
+same_srv_rate mean: 0.660927659102 stddev: 0.439622862407 max: 1.0 mi: 0.0
+dst_host_count mean: 182.148944615 stddev: 99.2062130346 max: 255 mi: 0
+dst_host_srv_count mean: 115.653005009 stddev: 110.702740781 max: 255 mi: 0
+dst_host_same_srv_rate mean: 0.521241694649 stddev: 0.448949363718 max: 1.0 mi: 0.0
+dst_host_diff_srv_rate mean: 0.0829511085709 stddev: 0.188921799905 max: 1.0 mi: 0.0
+dst_host_serror_rate mean: 0.284452462036 stddev: 0.444784050316 max: 1.0 mi: 0.0
+dst_host_srv_serror_rate mean: 0.278484516523 stddev: 0.445669123886 max: 1.0 mi: 0.0
+dst_host_rerror_rate mean: 0.118831813166 stddev: 0.306557458025 max: 1.0 mi: 0.0
+        dst_bytes  wrong_fragment  count  serror_rate  srv_serror_rate  \
+0               0               0      0          0.0              0.0   
+1               0               0      0          0.0              0.0   
+2               0               0      0          1.0              1.0   
+3               0               0      0          0.2              0.2   
+4               0               0      0          0.0              0.0   
+...           ...             ...    ...          ...              ...   
+125968          0               0      0          1.0              1.0   
+125969          0               0      0          0.0              0.0   
+125970          0               0      0          0.0              0.0   
+125971          0               0      0          1.0              1.0   
+125972          0               0      0          0.0              0.0   
+
+        srv_rerror_rate  same_srv_rate  dst_host_count  dst_host_srv_count  \
+0                   0.0           1.00               0                   0   
+1                   0.0           0.08               1                   0   
+2                   0.0           0.05               1                   0   
+3                   0.0           1.00               0                   1   
+4                   0.0           1.00               1                   1   
+...                 ...            ...             ...                 ...   
+125968              0.0           0.14               1                   0   
+125969              0.0           1.00               1                   0   
+125970              0.0           1.00               1                   0   
+125971              0.0           0.06               1                   0   
+125972              0.0           1.00               1                   0   
+
+        dst_host_same_srv_rate  dst_host_diff_srv_rate  dst_host_serror_rate  \
+0                         0.17                    0.03                  0.00   
+1                         0.00                    0.60                  0.00   
+2                         0.10                    0.05                  1.00   
+3                         1.00                    0.00                  0.03   
+4                         1.00                    0.00                  0.00   
+...                        ...                     ...                   ...   
+125968                    0.10                    0.06                  1.00   
+125969                    0.96                    0.01                  0.00   
+125970                    0.12                    0.06                  0.72   
+125971                    0.03                    0.05                  1.00   
+125972                    0.30                    0.03                  0.00   
+
+        dst_host_srv_serror_rate  dst_host_rerror_rate  labels  
+0                           0.00                  0.05       0  
+1                           0.00                  0.00       0  
+2                           1.00                  0.00       1  
+3                           0.01                  0.00       0  
+4                           0.00                  0.00       0  
+...                          ...                   ...     ...  
+125968                      1.00                  0.00       1  
+125969                      0.00                  0.00       0  
+125970                      0.00                  0.01       0  
+125971                      1.00                  0.00       1  
+125972                      0.00                  0.00       0  
+
+[125973 rows x 15 columns]
+
+('DTree:depth23:features7', [0.9585538343115558, 0.0, 0.051505088806152344, 0.0])
+('Total time elapsed', '0:00:01.314983')
+('Features', 14, 'Algorithm', 'DTree')

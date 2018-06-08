@@ -246,6 +246,7 @@ def linSVC_with_tol_iter_fixed(data,tolerance,iterations):
     evaluator =  BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     metric = evaluator.evaluate(predictions)
     crossed['linSVC:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
+    return crossed
 
 def binLR_with_tol_iter_search(data,cross=0, tol_start=0, tol_end=-9, iter_start=0, iter_end=7):    
     for tol_exp in range(tol_start,tol_end-1,-1):
@@ -271,6 +272,7 @@ def binLR_with_tol_iter_fixed():
     evaluator =  BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     metric = evaluator.evaluate(predictions)
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)].append([metric,time()-gt0])
+    return crossed
 
 def DTree_with_maxFeatures_maxDepth_search(data,cross=0,max_depth=5,max_features=2):    
     possible_features = list(range(2,max_features,1))
@@ -345,7 +347,9 @@ for cross in range(0,3):
     if A == 'kNN':
         kNN_with_k_search(data,cross=cross,k_start=1,k_end=51,k_step=2,)
     elif A == 'linSVC':
-        crossed = linSVC_with_tol_iter_search(data,cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+        # crossed = linSVC_with_tol_iter_search(data,cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+        # crossed = linSVC_with_tol_iter_fixed(data,0.00001,100000)
+        crossed = linSVC_with_tol_iter_fixed(data,0.0001,1000000)
     elif A == 'binLR':
         crossed = binLR_with_tol_iter_search(data,cross=cross,tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
     elif A == 'DTree':

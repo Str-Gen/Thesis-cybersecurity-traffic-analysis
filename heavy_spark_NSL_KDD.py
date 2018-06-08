@@ -340,7 +340,7 @@ def DTree_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
 
 def DTree_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     DTree = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
-    grid = ParamGridBuilder().addGrid(DTree.maxDepth,[max_depth]).addGrid(Dtree.maxBins,[max_features])
+    grid = ParamGridBuilder().addGrid(DTree.maxDepth,[max_depth]).addGrid(DTree.maxBins,[max_features]).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=DTree,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -361,7 +361,7 @@ def RForest_with_maxFeatures_maxDepth_search(df,max_depth=5,max_features=2):
 
 def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     RForest = DecisionTreeClassifier(featuresCol='features',labelCol='label',impurity='gini',maxMemoryInMB=1024)        
-    grid = ParamGridBuilder().addGrid(RForest.maxDepth,[max_depth]).addGrid(RForest.maxBins,[max_features])
+    grid = ParamGridBuilder().addGrid(RForest.maxDepth,[max_depth]).addGrid(RForest.maxBins,[max_features]).build()
     evaluator = BinaryClassificationEvaluator(rawPredictionCol='prediction',labelCol='label')
     tts = TrainValidationSplit(estimator=RForest,estimatorParamMaps=grid,evaluator=evaluator,trainRatio=0.6666)
     ttsModel = tts.fit(df)
@@ -369,15 +369,27 @@ def RForest_with_maxFeatures_maxDepth_fixed(df,max_depth,max_features):
     print('RForest:maxDepth',max_depth,':maxBins',max_features,':result',result)
 
 if A == 'kNN':
-    kNN_with_k_search(df,k_start=1,k_end=51,k_step=2)    
+    # kNN_with_k_search(df,k_start=1,k_end=51,k_step=2)    
+    kNN_with_k_fixed(df,1)
 elif A == 'linSVC':
-    crossed = linSVC_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    # crossed = linSVC_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    crossed = linSVC_with_tol_iter_fixed(df,0.1,10)
 elif A == 'binLR':
-    crossed = binLR_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    # crossed = binLR_with_tol_iter_search(df, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+    crossed = binLR_with_tol_iter_fixed(df,0.001,100)
+    # crossed = binLR_with_tol_iter_fixed(df,0.1,10)
+    # crossed = binLR_with_tol_iter_fixed(df,0.00001,10000)
 elif A == 'DTree':
-    crossed = DTree_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
+    #crossed = DTree_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
+    #crossed = DTree_with_maxFeatures_maxDepth_fixed(df,23,14)
+    #crossed = DTree_with_maxFeatures_maxDepth_fixed(df,23,14)
+    crossed = DTree_with_maxFeatures_maxDepth_fixed(df,23,38)
 elif A == 'RForest':
-    crossed = RForest_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
+    #crossed = RForest_with_maxFeatures_maxDepth_search(df, max_depth=30, max_features=F)
+    # crossed = RForest_with_maxFeatures_maxDepth_fixed(df,28,14)
+    # crossed = RForest_with_maxFeatures_maxDepth_fixed(df,28,16)
+    crossed = RForest_with_maxFeatures_maxDepth_fixed(df,26,37)
+
     
 print('Total time elapsed',str(timedelta(seconds=time()-totaltime)))
 print('Features',F,'Algorithm',A)    

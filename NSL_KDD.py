@@ -230,7 +230,7 @@ def linSVC_with_tol_iter_fixed(data, tolerance, iterations):
     result = classifier.score(X_test, Y_test)
     crossed['linSVC:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)] = []
     crossed['linSVC:tol1e'+repr(tolerance)+':iter1e' +
-            repr(iterations)].append([metric, time()-gt0])
+            repr(iterations)].append([result, time()-gt0])
     return crossed
 
 
@@ -341,13 +341,22 @@ for cross in range(0, 3):
     if A == 'kNN':
         crossed = kNN_with_k_search(data, cross=cross, k_start=1, k_end=51, k_step=2, distance_power=2)
     elif A == 'linSVC':
-        crossed = linSVC_with_tol_iter_search(data, cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+        # crossed = linSVC_with_tol_iter_search(data, cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
+        # crossed = linSVC_with_tol_iter_fixed(data,0.0001,10)
+        # crossed = linSVC_with_tol_iter_fixed(data,0.0001,10)        
+        crossed = linSVC_with_tol_iter_fixed(data,0.0001,1000000)
     elif A == 'binLR':
         crossed = binLR_with_tol_iter_search(data, cross=cross, tol_start=0, tol_end=-9, iter_start=0, iter_end=7)
     elif A == 'DTree':
-        crossed = DTree_with_maxFeatures_maxDepth_search(data, cross=cross, max_depth=30, max_features=F)
+        # crossed = DTree_with_maxFeatures_maxDepth_search(data, cross=cross, max_depth=30, max_features=F)
+        # crossed = DTree_with_maxFeatures_maxDepth_fixed(data,23,7)
+        # crossed = DTree_with_maxFeatures_maxDepth_fixed(data,27,13)
+        crossed = DTree_with_maxFeatures_maxDepth_fixed(data,27,34)
     elif A == 'RForest':
-        crossed = RForest_with_maxFeatures_maxDepth_search(data, cross=cross, max_depth=30, max_features=F)
+        #crossed = RForest_with_maxFeatures_maxDepth_search(data, cross=cross, max_depth=30, max_features=F)
+        # crossed = RForest_with_maxFeatures_maxDepth_fixed(data,24,2)
+        # crossed = RForest_with_maxFeatures_maxDepth_fixed(data,29,5)
+        crossed = RForest_with_maxFeatures_maxDepth_fixed(data,23,28)
 print
 
 for k in crossed:
