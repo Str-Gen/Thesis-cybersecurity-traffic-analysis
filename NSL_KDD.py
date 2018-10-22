@@ -259,7 +259,7 @@ def binLR_with_tol_iter_fixed(data, tolerance, iterations):
     result = classifier.score(X_test, Y_test)
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e'+repr(iterations)] = []
     crossed['binLR:tol1e'+repr(tolerance)+':iter1e' +
-            repr(iterations)].append([metric, time()-gt0])
+            repr(iterations)].append([result, time()-gt0])
     return crossed
 
 
